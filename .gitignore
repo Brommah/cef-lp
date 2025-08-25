@@ -25,3 +25,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# misc
+.DS_Store
+
+# safety
+.next/
+node_modules/
+.vercel/
+
