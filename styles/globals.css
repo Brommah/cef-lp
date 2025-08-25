@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap");
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 221 83% 53%;
+    --radius: 1rem;
+    --font-inter: "Inter", sans-serif;
+    --font-mono: "Roboto Mono", monospace;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 217 91% 60%;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Clash Display", var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+}
+
+/* Enhanced 2025 design system with advanced glassmorphism and animations */
+@layer components {
+  .glass {
+    @apply backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-lg bg-white/40 dark:bg-black/40 border border-white/20 dark:border-white/10 shadow-lg;
+  }
+
+  .glass-header {
+    @apply backdrop-blur-xl bg-background/80 border-b border-white/20 dark:border-white/10;
+  }
+
+  .glass-depth {
+    @apply backdrop-blur-xl bg-gradient-to-br from-white/30 to-white/10 dark:from-white/10 dark:to-white/5 
+           border border-white/30 dark:border-white/20 shadow-2xl shadow-blue-500/10;
+  }
+
+  .glass-float {
+    @apply backdrop-blur-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 dark:from-blue-400/10 dark:to-cyan-400/5
+           border border-blue-300/30 dark:border-blue-400/20 shadow-xl shadow-blue-500/20;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent;
+  }
+
+  .text-gradient-dynamic {
+    @apply bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent animate-gradient-shift;
+    background-size: 200% 100%;
+  }
+
+  .text-gradient-warm {
+    @apply bg-gradient-to-r from-orange-500 via-pink-500 to-red-500 bg-clip-text text-transparent;
+  }
+
+  .magnetic-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:-translate-y-1;
+  }
+
+  .tilt-hover {
+    @apply transition-transform duration-300 hover:rotate-1 hover:scale-105;
+  }
+
+  .parallax-slow {
+    transform: translateY(var(--scroll-y, 0) * 0.5px);
+  }
+
+  .parallax-fast {
+    transform: translateY(var(--scroll-y, 0) * -0.3px);
+  }
+
+  .ai-particle {
+    @apply absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-60
+           animate-pulse;
+  }
+
+  .neural-line {
+    @apply absolute h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent
+           animate-pulse;
+  }
+
+  .hero-mesh {
+    background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  }
+
+  .section-glow {
+    @apply relative before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-br 
+           before:from-blue-500/5 before:via-transparent before:to-cyan-500/5 before:blur-3xl;
+  }
+
+  /* Fixed rotating text styles to work properly */
+  .rotating-text {
+    position: relative;
+    display: inline-block;
+    min-width: 300px;
+    height: 1.2em;
+    text-align: left;
+  }
+
+  .rotate-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: rotate-text 6s infinite;
+  }
+
+  .rotate-item:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .rotate-item:nth-child(2) {
+    animation-delay: 2s;
+  }
+
+  .rotate-item:nth-child(3) {
+    animation-delay: 4s;
+  }
+
+  .rotate-item.active {
+    position: relative;
+    opacity: 1;
+  }
+}
+
+/* Advanced animations for 2025 feel */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+@keyframes neural-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100px) translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* Updated rotating text animation for smoother transitions */
+@keyframes rotate-text {
+  0%,
+  30% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  35%,
+  65% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-neural-pulse {
+  animation: neural-pulse 2s ease-in-out infinite;
+}
+
+.animate-particle-drift {
+  animation: particle-drift 8s linear infinite;
+}
+
+.animate-rotate-text {
+  animation: rotate-text 6s infinite;
+}
+
+/* Variable font utilities */
+.font-display {
+  font-family: "Clash Display", var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-variation-settings: "wght" 600;
+}
+
+.font-display-bold {
+  font-family: "Clash Display", var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-variation-settings: "wght" 700;
+}
+
+.animate-in {
+  animation: animate-in 0.5s ease-out;
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
