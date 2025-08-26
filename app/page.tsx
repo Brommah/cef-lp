@@ -661,16 +661,16 @@ export default function LandingPage() {
                 <div className="space-y-5">
                   {[
                     {
-                      text: "Data silos & vendor lock-in",
-                      icon: "📦",
+                      text: "Black-box AI → No control, accountability, or transparency. Lacks auditability and oversight.",
+                      icon: "🔒",
                     },
                     {
-                      text: "No accountable AI",
-                      icon: "🧭",
-                    },
-                    {
-                      text: "Security & privacy risks",
+                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don’t own creates major risks.",
                       icon: "🔐",
+                    },
+                    {
+                      text: "Risky Integrations → Complex, fragile, and costly to stitch together siloed, outdated systems into a functional AI data flow.",
+                      icon: "⚠️",
                     },
                   ].map((item, i) => (
                     <motion.div
@@ -761,22 +761,23 @@ export default function LandingPage() {
             >
               <div className="mb-4">
                 <div className="inline-flex items-center gap-2" aria-label="CEF logo">
-                  <svg className="h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" role="img">
-                    <rect x="2" y="3" width="16" height="14" rx="3" fill="#2563EB"/>
-                    <rect x="5" y="6" width="10" height="2" rx="1" fill="white"/>
-                    <rect x="5" y="9" width="7" height="2" rx="1" fill="white"/>
-                    <rect x="5" y="12" width="10" height="2" rx="1" fill="white"/>
-                  </svg>
-                  <svg className="h-4 w-auto" viewBox="0 0 60 16" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CEF wordmark">
-                    <text x="0" y="13" fontFamily="Inter, system-ui, Arial, sans-serif" fontWeight="800" fontSize="14" fill="#0F172A">CEF</text>
-                  </svg>
+                  <img
+                    src="https://cdn.prod.website-files.com/674765a62fb62fecf4da7696/674765a62fb62fecf4da7836_Logo%20Nav.svg"
+                    alt="CEF logo"
+                    className="h-6 w-auto"
+                    loading="eager"
+                    decoding="async"
+                  />
                 </div>
               </div>
               <h2 className="text-left text-4xl md:text-6xl font-display-bold tracking-tight leading-[1.1] text-slate-900 dark:text-white [text-wrap:balance]">
-                Turn AI into <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Agile Data Products</span>
+                Ship AI Like Software.
+                <br />
+                <span className="text-slate-700 dark:text-slate-300 text-3xl md:text-4xl block mt-2">With the same safety, speed, and control.</span>
               </h2>
-              <p className="mt-6 text-lg md:text-xl text-muted-foreground font-medium text-left italic">
-                Make AI a product, not plumbing. One place to version, test, and ship AI logic: replay runs, gate releases on KPIs, and roll back in a click. Your models, prompts, and policies evolve like software: fast, iterative, and always moving forward.
+              <p className="mt-6 text-lg md:text-xl text-muted-foreground font-medium text-left">
+                Test, version, and ship multi‑agent AI on your dedicated stack, with replays, KPI gates, and instant rollback. Open‑source models only; no data leaves your infra. <span className="font-semibold">
+                </span>
               </p>
               <div className="mt-6">
                 <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
@@ -914,7 +915,7 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1 }}
                   whileHover={{ scale: 1.02 }}
                   viewport={{ once: false, amount: 0.4 }}
-                  className="group rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-md border border-slate-200/70 dark:border-slate-700/60 shadow-xl p-6 transition-transform"
+                  className="hidden md:block group rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-md border border-slate-200/70 dark:border-slate-700/60 shadow-xl p-6 transition-transform"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-display-bold text-lg text-slate-900 dark:text-white">Version 5 (Previous)</h3>
@@ -941,8 +942,8 @@ export default function LandingPage() {
                     <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 ring-1 ring-brand-accent/40">Live in Production</span>
                   </div>
                   <div className="space-y-3 text-sm text-slate-800 dark:text-slate-200">
-                    <div className="flex items-start gap-2"><Cog className="size-4 mt-1 text-slate-700" /><span><span className="font-semibold">What's Working:</span> Your AI agents now handle optimized multi‑agent workflows, scaled to dedicated clusters.</span></div>
-                    <div className="flex items-start gap-2"><Shield className="size-4 mt-1 text-cyan-600" /><span><span className="font-semibold">Governance:</span> Performance‑gated promotions ensure changes deploy only after hitting targets.</span></div>
+                    <div className="flex items-start gap-2"><Cog className="size-4 mt-1 text-slate-700" /><span><span className="font-semibold">What's Working:</span> Optimized multi‑agent workflows on dedicated clusters—powered by live signals.</span></div>
+                    <div className="flex items-start gap-2"><Shield className="size-4 mt-1 text-cyan-600" /><span><span className="font-semibold">Governance:</span> Performance‑gated promotions with instant rollback. Replay and audit for every decision.</span></div>
                     <div className="group flex items-start gap-2 pl-3 border-l-2 border-brand-accent/40">
                       <ArrowUpRight className="size-4 mt-0.5 text-brand-accent transition-transform group-hover:translate-x-0.5" />
                       <span className="font-semibold"><span className="font-semibold">Proven Impact:</span> <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+6.1%</span> conversion uplift (from onboarding funnel test).</span>
@@ -991,10 +992,10 @@ export default function LandingPage() {
                     <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">In A/B Test</span>
                   </div>
                   <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                    <div className="flex items-center gap-2"><Lightbulb className="size-4 text-yellow-500" /><span><span className="font-semibold">What's New:</span> Real‑time customer mood detection + computer vision (CV) triggers for precision response routing.</span></div>
-                    <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Efficiency:</span> ~<span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">15%</span> lower infrastructure costs (via runtime tuning + GPU pooling).</span></div>
+                    <div className="flex items-center gap-2"><Lightbulb className="size-4 text-yellow-500" /><span><span className="font-semibold">What's New:</span> Real‑time user sentiment analysis + computer vision (CV) triggers for precision response routing.</span></div>
+                    <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Efficiency:</span> ~<span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">15%</span> lower infrastructure costs from runtime tuning and GPU pooling.</span></div>
                     <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Early Results:</span> ~<span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">20%</span> fewer customers abandon in high‑risk situations (thanks to precise routing).</span></div>
-                    <div className="flex items-center gap-2"><Rocket className="size-4 text-slate-700" /><span><span className="font-semibold">Deployment:</span> Auto‑rolling deployment covers <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">5%</span> of traffic with automated, instant rollback guardrails.</span></div>
+                    <div className="flex items-center gap-2"><Rocket className="size-4 text-slate-700" /><span><span className="font-semibold">Deployment:</span> Auto‑rolling deploy with guardrails; <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">5%</span> traffic coverage to start.</span></div>
                     <p className="text-xs text-muted-foreground mt-2 italic">Lower infra costs and fewer customer drop‑offs, with risk‑limited rollout.</p>
                   </div>
                 </motion.div>
@@ -1145,7 +1146,7 @@ export default function LandingPage() {
  
                        <div className="border-l-4 border-blue-500 pl-4 mb-6">
                          <h4 className="font-semibold text-slate-900 mb-2">Triggers:</h4>
-                         <p className="text-slate-600 text-base">Topic surge, whale wallet activity, campaign execution, governance proposal, concern clusters</p>
+                         <p className="text-slate-600 text-base">Topic surge, purchase activity, campaign execution, concern clusters, etc.</p>
                        </div>
  
                        <div className="border-l-4 border-green-500 pl-4 mb-6">
@@ -1512,78 +1513,83 @@ export default function LandingPage() {
             >
               {[
                 {
-                  title: "Computer Vision: Real-time Anomaly Detection",
-                  heroHeadline: "Computer Vision Ops",
+                  title: "Computer Vision: Real‑time Anomaly Detection ",
+                  heroHeadline: "Computer Vision Ops: From Anomalies to Robotics",
                   heroDescription:
-                    "Ingest drone/CCTV video into RAFT for real-time detection and automated alerts.",
+                    "Ingest video, detect anomalies, and trigger real-time fleet or robotics responses.",
                   image: "/placeholder.jpg",
                   triggers:
-                    "Video frames, illegal parking detection, rail yard monitoring, object recognition events, zone breaches, battery/signal warnings",
+                    "Frame ingest, illegal parking, rail‑yard events, object/zone breaches, battery/signal degradations",
                   items: [
-                    "Streaming video ingest with edge processing",
-                    "CV Detection Agent (96.8% accuracy on transport manifests)",
-                    "Real-time alerting & mission dashboards",
-                    "On-premise data nodes for secure processing",
+                    "Streaming ingest with edge processing",
+                    "CV Detection Agent (96.8% manifest accuracy)",
+                    "Mission dashboards with real‑time alerts",
+                    "On‑prem nodes for sovereign, leak‑free compute",
                   ],
                   kpis: [
                     { name: "Detection accuracy", color: "bg-green-100 text-green-700" },
-                    { name: "Response time", color: "bg-blue-100 text-blue-700" },
+                    { name: "Time‑to‑alert", color: "bg-blue-100 text-blue-700" },
                     { name: "False positive rate", color: "bg-red-100 text-red-700" },
-                    { name: "Infrastructure uptime", color: "bg-purple-100 text-purple-700" },
+                    { name: "Infra uptime", color: "bg-purple-100 text-purple-700" },
                   ],
                   icon: "🎥",
                   index: 3,
                   span: "md:col-span-3",
                   overview:
-                    "Deploy on-prem computer vision quickly: capture video feeds, process in RAFT, surface live insights and alerts without rebuilding pipelines.",
+                    "Edge‑first CV agents that perceive, decide, act on live video—on your dedicated stack.",
                   applicability: [
                     "Drone/CCTV monitoring",
-                    "Safety & compliance",
+                    "Industrial/robotics ops",
                     "Facilities & logistics",
                     "Smart city feeds",
                   ],
                 },
                 {
-                  title: "Gaming: Player Retention & Trust/Safety",
-                  heroHeadline: "Personalized Game Experiences",
+                  title: "Gaming: Player Retention & Trust/Safety ",
+                  heroHeadline: "A Concierge Agent for Every Player",
                   heroDescription:
-                    "A dedicated AI concierge for every player, turning real-time behavior into adaptive gameplay.",
+                    "Adaptive gameplay from live signals, not after‑the‑fact reports.",
                   image:
                     "https://cdn.ddcdragon.com/1229/baear4ihc4nevss365lzjv4vqvsknwjapkvghhsx3meto4i6rz7b5aktqny/gaming.png?source=developer-console",
                   triggers:
-                    "Rage-quit patterns, loss streaks, toxic chat spikes, cohort churn risk, social/Discord sentiment",
-                  items: ["Frustration Detector", "T&S Sentinel", "Matchmaking Concierge"],
+                    "Rage‑quit streaks, loss spirals, toxic chat spikes, churn‑risk cohorts, Discord/social sentiment",
+                  items: [
+                    "Frustration Detector",
+                    "T&S Sentinel",
+                    "Matchmaking Concierge",
+                    "Dedicated, sovereign runtime",
+                  ],
                   kpis: [
                     { name: "Churn delta", color: "bg-purple-100 text-purple-700" },
-                    { name: "Session recovery", color: "bg-blue-100 text-blue-700" },
+                    { name: "Session recovery rate", color: "bg-blue-100 text-blue-700" },
                     { name: "Abuse reports", color: "bg-red-100 text-red-700" },
-                    { name: "CSAT after session", color: "bg-green-100 text-green-700" },
+                    { name: "Post‑session CSAT", color: "bg-green-100 text-green-700" },
                   ],
                   icon: "🎮",
                   index: 0,
                   overview:
-                    "Transform player experiences with AI agents that detect frustration patterns in real-time and adapt gameplay to maintain engagement. Our gaming starter pack prevents churn by identifying at-risk players before they quit and automatically adjusting difficulty, matchmaking, and social interactions to keep them engaged.",
+                    "A concierge agent for every player—keeps them engaged and prevents churn with in‑session adaptation.",
                   applicability: [
-                    "Multiplayer games with high churn rates",
-                    "Competitive gaming platforms",
+                    "Multiplayer platforms",
+                    "Competitive gaming",
                     "Social gaming communities",
-                    "Free-to-play mobile games",
+                    "Free‑to‑play mobile",
                   ],
                   span: "md:col-span-3",
                 },
                 {
                   title: "Support: Conversation Intelligence",
-                  heroHeadline: "Proactive Customer Support",
-                  heroDescription: "Understand user needs so well, you'll never send a satisfaction survey again.",
+                  heroHeadline: "Proactive Support",
+                  heroDescription: "Know intent in real time so you never send a survey again.",
                   image:
                     "https://cdn.ddcdragon.com/1229/baear4ihc4nevss365lzjv4vqvsknwjapkvghhsx3meto4i6rz7b5aktqny/communitcation.png?source=developer-console",
                   triggers:
-                    "Inbound call/chat, long handle time, repeat contacts, VIP risk, compliance terms mentioned",
+                    "New call/chat, long handle time, repeat contacts, VIP risk, compliance terms detected",
                   items: [
                     "Live Transcriber",
                     "Intent & Compliance Classifier",
                     "Coach/QA Summarizer",
-                    "Next-Best-Action Router",
+                    "Next‑Best‑Action Router—running on your sovereign stack",
                   ],
                   kpis: [
                     { name: "AHT", color: "bg-purple-100 text-purple-700" },
@@ -1594,38 +1600,43 @@ export default function LandingPage() {
                   icon: "🎧",
                   index: 1,
                   overview:
-                    "Revolutionize customer support with AI agents that understand context, intent, and sentiment in real-time. Our support starter pack reduces handle times while improving satisfaction by providing agents with intelligent recommendations and automating routine tasks.",
+                    "Proactive support agents that reduce handle time and improve outcomes—without surveys.",
                   applicability: [
                     "Customer service centers",
                     "SaaS support teams",
-                    "E-commerce help desks",
-                    "Financial services support",
+                    "E‑commerce help desks",
+                    "Financial services",
                   ],
                   span: "md:col-span-3",
                 },
                 {
-                  title: "Communities & Web3: Health & Growth",
-                  heroHeadline: "Real-time Community Sentiment",
-                  heroDescription: "Instantly detect sentiment shifts and prevent toxic behavior before it spreads.",
+                  title: "Communities & Web3: Health & Growth ",
+                  heroHeadline: "Real‑time Sentiment and Action",
+                  heroDescription: "Stop toxicity before it spreads; grow cohorts with precision.",
                   image:
                     "https://cdn.ddcdragon.com/1229/baear4ifceuftmm225vm6xz4em7pmfaz6gctvyc5ifnxs4aizemyxfvdmma/community.png?source=developer-console",
                   triggers:
-                    "Topic surge, whale wallet activity, campaign execution, governance proposal, concern clusters",
-                  items: ["Topic Surge Monitor", "Cohort Growth Planner", "Risk Router"],
+                    "Topic surges, whale wallet movements, campaign execution, governance proposals, concern clusters",
+                  items: [
+                    "Topic Surge Monitor",
+                    "Cohort Growth Planner",
+                    "Risk Router",
+                    "Dedicated data cluster with open‑source models only",
+                  ],
                   kpis: [
-                    { name: "Engagement", color: "bg-purple-100 text-purple-700" },
+                    { name: "Engagement lift", color: "bg-purple-100 text-purple-700" },
                     { name: "Cohort retention", color: "bg-blue-100 text-blue-700" },
                     { name: "Campaign conversion", color: "bg-green-100 text-green-700" },
-                    { name: "Mod workload", color: "bg-orange-100 text-orange-700" },
+                    { name: "Moderator workload", color: "bg-orange-100 text-orange-700" },
                   ],
                   icon: "🌐",
                   index: 2,
                   overview:
-                    "Maintain healthy, growing communities with AI agents that monitor sentiment, detect emerging issues, and facilitate positive engagement. Our community starter pack prevents toxic behavior while fostering organic growth and meaningful interactions.",
+                    "Real‑time sentiment and action to maintain healthy communities and growth.",
                   applicability: [
                     "Discord/Slack communities",
-                    "Web3 and DeFi projects",
-                    "Online forums and platforms",
+                    "Web3 & DeFi projects",
+                    "Online forums/platforms",
                     "Social media communities",
                   ],
                   span: "md:col-span-3",
@@ -2024,7 +2035,7 @@ export default function LandingPage() {
                 Trusted by Industry Leaders
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl font-medium leading-relaxed">
-                See how teams are using CEF to transform their operations and deliver measurable results.
+                See how teams are using CEF to transform their operations by maximizing their <b>AI Agility</b>.
               </p>
             </motion.div>
 
