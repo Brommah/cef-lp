@@ -35,6 +35,8 @@ import {
   Trophy,
   Lightbulb,
   Rocket,
+  Package,
+  Compass,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -249,7 +251,7 @@ export default function LandingPage() {
     },
     {
       headline: "Computer Vision Ops",
-      description: "for autonomous surveillance & security",
+      description: "Automate monitoring to free up human operators for critical events",
       cta: "More on Vision",
       industry: "Vision",
       icon: <Cpu className="size-4 text-white" />,
@@ -659,16 +661,16 @@ export default function LandingPage() {
                 <div className="space-y-5">
                   {[
                     {
-                      text: "Black-box AI → No control, accountability, or transparency. Lacks auditability and oversight.",
-                      icon: "🔒",
+                      text: "Data silos & vendor lock-in",
+                      icon: "📦",
                     },
                     {
-                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don't own creates major risks.",
+                      text: "No accountable AI",
+                      icon: "🧭",
+                    },
+                    {
+                      text: "Security & privacy risks",
                       icon: "🔐",
-                    },
-                    {
-                      text: "Risky Integrations → Complex, fragile, and costly to stitch together siloed, outdated systems into a functional AI data flow.",
-                      icon: "⚠️",
                     },
                   ].map((item, i) => (
                     <motion.div
@@ -712,16 +714,16 @@ export default function LandingPage() {
                 <div className="space-y-5">
                   {[
                     {
-                      text: "Full Control → Real-time dynamic agent orchestration with secure and fully auditable execution at every step.",
+                      text: "Sovereign by Design → Your infrastructure, your controls, your models.",
                       icon: "🛡️",
                     },
                     {
-                      text: "Dedicated Data Infrastructure → Out-of-the-box, optimized for speed and cost. On-prem, edge, or hybrid deployments.",
-                      icon: "🗄️",
+                      text: "Agents You Own → Fully auditable, personalized agents that evolve with your data.",
+                      icon: "🔄",
                     },
                     {
-                      text: "Open Source Models → Models you own and tune to your business needs, continuously evolving with your data and your use cases.",
-                      icon: "🔄",
+                      text: "Dedicated Data Infra → Optimized for speed and cost, on-prem, edge, or hybrid.",
+                      icon: "🗄️",
                     },
                   ].map((item, i) => (
                     <motion.div
@@ -922,7 +924,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-2"><Cog className="size-4 text-slate-600" /><span><span className="font-semibold">What We Built:</span> AI agent suite with <strong>2</strong> real‑time data streams (community feedback + customer activity).</span></div>
                     <div className="flex items-center gap-2"><Shield className="size-4 text-emerald-600" /><span><span className="font-semibold">Infrastructure:</span> Secured on dedicated infrastructure with full audit trail before any changes go live.</span></div>
                     <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Proven Results:</span> <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+8.2%</span> lift in customer engagement across all users.</span></div>
-                    <div className="flex items-center gap-2"><Check className="size-4 text-emerald-600" /><span><span className="font-semibold">Status:</span> Successfully scaled into production in <span className="font-semibold">Q2 2025</span>.</span></div>
+                    <div className="flex items-center gap-2"><Check className="size-4 text-emerald-600" /><span><span className="font-semibold">Status:</span> Successfully scaled into production in <span className="font-semibold">Q2 2025</span>.</span></div>
                     <p className="text-xs text-muted-foreground mt-3 italic">Proof that AI streaming could safely scale into production.</p>
                   </div>
                 </motion.div>
@@ -1182,30 +1184,26 @@ export default function LandingPage() {
                      </div>
                      <div className="p-6 flex-1 flex flex-col">
                        <div className="border-l-4 border-slate-300 pl-4 mb-6">
-                         <h3 className="text-2xl font-display-bold text-slate-900 mb-2">Computer Vision Ops</h3>
-                         <p className="text-slate-600 text-base">Ingest drone/CCTV video into RAFT for real‑time detection and automated alerts.</p>
+                         <h3 className="text-2xl font-display-bold text-slate-900 mb-2">Computer Vision Ops: From Anomalies to Robotics</h3>
+                         <p className="text-slate-600 text-base">Ingest video, detect anomalies, and trigger real-time fleet or robotics responses.</p>
                        </div>
  
                        <div className="border-l-4 border-blue-500 pl-4 mb-6">
-                         <h4 className="font-semibold text-slate-900 mb-2">Triggers:</h4>
-                         <p className="text-slate-600 text-base">Video frames, safety events, zone breaches, object detections</p>
-                       </div>
- 
-                       <div className="border-l-4 border-green-500 pl-4 mb-6">
                          <h4 className="font-semibold text-slate-900 mb-2">What's inside:</h4>
                          <ul className="space-y-2 text-slate-700">
-                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Streaming ingest</li>
-                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>CV Detection Agent</li>
-                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Alerting & Dashboards</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Secure on‑prem processing</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Fleet dashboards & mission control</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>CV agents for industrial safety monitoring</li>
                          </ul>
                        </div>
  
-                       <div className="border-l-4 border-purple-500 pl-4 mb-6">
+                       <div className="border-l-4 border-green-500 pl-4 mb-6">
                          <h4 className="font-semibold text-slate-900 mb-2">KPIs:</h4>
                          <div className="flex flex-wrap gap-2">
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Detection accuracy</span>
                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Response time</span>
-                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Detections</span>
-                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">False positives</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">False positive rate</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">Fleet uptime / mission safety</span>
                          </div>
                        </div>
  
@@ -1921,6 +1919,7 @@ export default function LandingPage() {
         </section>
         )}
 
+        {false && (
         <section id="how-it-works" className="w-full py-20 md:py-32 bg-white dark:bg-gray-950 relative overflow-hidden">
           <div className="container px-4 md:px-6 relative z-10">
             <motion.div
@@ -2007,6 +2006,7 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </section>
+        )}
 
         <section className="w-full py-20 md:py-32 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
           <div className="container px-4 md:px-6 relative z-10">
