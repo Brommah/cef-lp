@@ -43,6 +43,9 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Brand accent used for KPI metrics */
+    --brand-accent: 156 72% 40%;
+    --brand-accent-foreground: 156 90% 96%;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -77,6 +80,8 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --brand-accent: 156 72% 42%;
+    --brand-accent-foreground: 156 90% 10%;
   }
 }
 

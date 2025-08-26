@@ -272,6 +272,59 @@
   animation: rotate-text 6s infinite;
 }
 
+/* Minimal promote rail animation */
+@keyframes rail-dot {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(40px); }
+  100% { transform: translateX(0); }
+}
+
+.rail-dot {
+  animation: rail-dot 1.4s ease-in-out infinite;
+}
+
+/* Gradient border utility for light cards on mobile */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(59,130,246,0.6), rgba(34,211,238,0.6));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  padding: 1px;
+  pointer-events: none;
+}
+
+/* Mobile-only gradient border */
+.mobile-gradient-border {
+  position: relative;
+}
+
+.mobile-gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(59,130,246,0.6), rgba(34,211,238,0.6));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  padding: 1px;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .mobile-gradient-border::before {
+    content: none;
+  }
+}
+
 /* Variable font utilities */
 .font-display {
   font-family: "Clash Display", var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;

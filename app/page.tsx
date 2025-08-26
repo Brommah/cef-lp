@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
 import {
@@ -12,20 +12,39 @@ import {
   ArrowRight,
   Zap,
   Shield,
+  ShieldCheck,
   Cpu,
   Eye,
   Play,
-  Pause,
   Database,
   GitBranch,
   Gamepad2,
   Headphones,
   Globe2,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  RefreshCw,
+  CheckCircle2,
+  Cog,
+  ArrowUpRight,
+  CalendarClock,
+  RotateCcw,
+  History,
+  Check,
+  Trophy,
+  Lightbulb,
+  Rocket,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTheme } from "next-themes"
+import dynamic from "next/dynamic"
+import { useIsMobile } from "@/hooks/use-mobile"
+
+const HeroTorus = dynamic(() => import("@/components/HeroTorus"), { ssr: false })
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -36,6 +55,41 @@ export default function LandingPage() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedJourney, setSelectedJourney] = useState<number | null>(null)
+
+  // Mobile journeys scroller state
+  const mobileUsecaseScrollRef = useRef<HTMLDivElement | null>(null)
+  const [mobileActiveJourney, setMobileActiveJourney] = useState(0)
+
+  const scrollToJourney = (index: number) => {
+    const container = mobileUsecaseScrollRef.current
+    if (!container) return
+    const slides = Array.from(
+      container.querySelectorAll('[data-journey-slide]')
+    ) as HTMLElement[]
+    const target = slides[index]
+    if (target) {
+      container.scrollTo({ left: target.offsetLeft, behavior: "smooth" })
+    }
+  }
+
+  const handleMobileScroll = () => {
+    const container = mobileUsecaseScrollRef.current
+    if (!container) return
+    const slides = Array.from(
+      container.querySelectorAll('[data-journey-slide]')
+    ) as HTMLElement[]
+    let closestIndex = 0
+    let minDist = Number.POSITIVE_INFINITY
+    const left = container.scrollLeft || 0
+    slides.forEach((el, idx) => {
+      const dist = Math.abs(left - el.offsetLeft)
+      if (dist < minDist) {
+        minDist = dist
+        closestIndex = idx
+      }
+    })
+    setMobileActiveJourney(closestIndex)
+  }
 
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
@@ -98,30 +152,78 @@ export default function LandingPage() {
   const [isRotatingPaused, setIsRotatingPaused] = useState(false)
   const prefersReducedMotion = useReducedMotion()
   const ROTATION_MS = 6000
+  const TRACER_MS = Math.max(1000, ROTATION_MS - 1000)
+
+  // Responsive tracer geometry: keep rim visible near bottom on mobile
+  const isMobile = useIsMobile()
+  const rimCx = isMobile ? 78 : 82
+  const rimCy = isMobile ? 52 : 40
+
+  // Path definitions (viewBox 100x60). Mobile path is more vertical toward the bottom.
+  const trackToRimD = isMobile
+    ? `M8 12 C 24 28, 50 40, ${rimCx} ${rimCy}`
+    : "M2 22 C 26 8, 54 6, 82 40"
+  const trackFullD = isMobile
+    ? `${trackToRimD} C ${rimCx + 6} ${rimCy + 6}, ${rimCx + 12} ${rimCy + 18}, ${rimCx + 16} ${rimCy + 34}`
+    : `${trackToRimD} C 92 52, 98 62, 102 74`
+
+  // Measure when tracer reaches rim as a fraction of total path length
+  const fullPathRef = useRef<SVGPathElement | null>(null)
+  const toRimPathRef = useRef<SVGPathElement | null>(null)
+  const [goalFraction, setGoalFraction] = useState(0.75)
+  const [goalHold, setGoalHold] = useState(0.749)
+  const [goalOn, setGoalOn] = useState(0.751)
+  const [goalHalfway, setGoalHalfway] = useState(0.375)
+
+  useEffect(() => {
+    try {
+      const full = fullPathRef.current?.getTotalLength?.() ?? 0
+      const toRim = toRimPathRef.current?.getTotalLength?.() ?? 0
+      if (full > 0 && toRim > 0) {
+        const frac = Math.max(0.1, Math.min(0.9, toRim / full)) // clamp to avoid edge cases
+        const eps = 0.001
+        setGoalFraction(frac)
+        setGoalOn(frac)
+        setGoalHalfway(Math.max(0, frac * 0.5)) // Start appearing at 50% of the way to the goal
+      }
+    } catch {}
+    // measure once on mount
+  }, [])
+
+  // Versions scrollytelling emphasis
+  const versionsRef = useRef<HTMLDivElement | null>(null)
+  const { scrollYProgress: versionsProgress } = useScroll({ target: versionsRef, offset: ["start 80%", "end 20%"] })
+  const v4Scale = useTransform(versionsProgress, [0, 0.15, 0.3], [1.03, 1.0, 0.97])
+  const v4Opacity = useTransform(versionsProgress, [0, 0.15, 0.3], [1, 0.9, 0.75])
+  const v5Scale = useTransform(versionsProgress, [0.25, 0.5, 0.65], [1.0, 1.05, 1.0])
+  const v5Opacity = useTransform(versionsProgress, [0.25, 0.5, 0.65], [0.9, 1.0, 0.9])
+  const v6Scale = useTransform(versionsProgress, [0.6, 0.8, 1], [1.0, 1.05, 1.06])
+  const v6Opacity = useTransform(versionsProgress, [0.6, 0.8, 1], [0.85, 1.0, 1.0])
+  const v6Glow = useTransform(versionsProgress, [0.8, 1], ["0 0 0 rgba(251,191,36,0)", "0 0 24px rgba(251,191,36,0.35)"])
 
   const rotatingContent = [
     {
       headline: "Real-time Community Management",
       description: "Agents proactively analyzing sentiment shifts and escalating in real-time.",
-      cta: "Learn how for Communities",
+      cta: "More on Groups",
       industry: "Communities",
       icon: <Globe2 className="size-4 text-white" />,
-      gradient: "from-sky-500 to-purple-500",
+      gradient: "from-blue-500 to-indigo-500 to blue-500",
     },
     {
-      headline: "Assisting Customer Support",
+      headline: "Proactive Customer Support",
       description:
-        "No more need for user Surveys! Join calls to learn how customer needs are being met and escalate before frustration builds.",
-      cta: "Learn how for Support",
+        "No more need for user Surveys. Meet customer needs and escalate before frustration builds.",
+      cta: "More on Support",
       industry: "Support",
       icon: <Headphones className="size-4 text-white" />,
-      gradient: "from-emerald-500 to-teal-500",
+      gradient: "from-blue-500 to-indigo-500",
     },
     {
       headline: "Personalized Gaming Experiences",
       description:
-        "Dedicated AI concierge agents customized for every player, adapting to the best game experience in real time.",
-      cta: "Learn how for Gaming",
+        "Evolving AI concierge agents tuned for every player, adapting for personalized live experiences.",
+      cta: "More on Gaming",
       industry: "Gaming",
       icon: <Gamepad2 className="size-4 text-white" />,
       gradient: "from-blue-500 to-indigo-500",
@@ -173,7 +275,7 @@ export default function LandingPage() {
               {mounted && theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
               <span className="sr-only">Toggle theme</span>
             </Button>
-            <Button asChild className="rounded-full glass-depth magnetic-hover font-semibold">
+            <Button asChild className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
               <Link href="https://app.lemcal.com/@fredjin/30-minutes">
                 Book a demo
                 <ChevronRight className="ml-1 size-4" />
@@ -206,95 +308,166 @@ export default function LandingPage() {
       </motion.header>
 
       <main className="flex-1">
-        <section className="w-full py-20 md:py-32 lg:py-40 overflow-hidden relative">
+        <div className="h-svh">
+          <section className="w-full pt-24 md:pt-32 lg:pt-40 pb-0 overflow-hidden relative h-full flex flex-col justify-center">
           <motion.div className="absolute inset-0 -z-10 hero-mesh" style={{ y: heroY, opacity: heroOpacity }} />
           <div className="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-black bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
 
-          {[...Array(12)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="ai-particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                x: [0, Math.random() * 100 - 50],
-                y: [0, Math.random() * 100 - 50],
-                opacity: [0.3, 0.8, 0.3],
-              }}
-              transition={{
-                duration: 4 + Math.random() * 4,
-                repeat: Number.POSITIVE_INFINITY,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
+            {/* --- NEW: Agent Constellation Background --- */}
+            <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
+              {/* Starfield */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-[size:3px_3px] opacity-10 animate-[pulse_8s_linear_infinite]" />
 
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="neural-line top-1/4 left-0 w-1/3 animate-neural-pulse" />
-            <div className="neural-line top-1/2 right-0 w-1/4 animate-neural-pulse delay-1000" />
-            <div className="neural-line bottom-1/3 left-1/4 w-1/2 animate-neural-pulse delay-2000" />
+              {/* Scanline overlay */}
+              <div className="absolute inset-0 bg-[linear-gradient(transparent_95%,rgba(255,255,255,0.05)_95%)] bg-[size:100%_2px] opacity-5" />
+
+              {/* SVG edge graph with neon gradient */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 60" preserveAspectRatio="xMidYMid slice" style={{ mixBlendMode: "screen" }}>
+                {/* removed static branch lines */}
+
+                {/* animated active path */}
+                <defs>
+                  <linearGradient id="edgeNeon" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.08" />
+                    <stop offset="100%" stopColor="#00aaff" stopOpacity="0.35" />
+                  </linearGradient>
+                  <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1.6" result="glow" />
+                    <feMerge>
+                      <feMergeNode in="glow" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                {/* dotted track path - subtle start, brighter end, continues out of frame */}
+                <motion.path
+                  key={`track-${currentProfile}`}
+                  d={trackFullD}
+                  stroke="url(#edgeNeon)"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeDasharray="0.01 7"
+                  ref={fullPathRef as any}
+                  initial={{ pathLength: 0, opacity: 1 }}
+                  animate={
+                    prefersReducedMotion || isRotatingPaused
+                      ? { pathLength: 0, opacity: 1 }
+                      : { pathLength: 1, opacity: [1, 1, 0] }
+                  }
+                  transition={{
+                    duration: TRACER_MS / 1000,
+                    ease: "linear",
+                    opacity: { duration: ROTATION_MS / 1000, ease: "linear", times: [0, goalOn, 1] },
+                  }}
+                />
+                {/* Hidden helper path: start -> rim */} 
+                <path d={trackToRimD} stroke="transparent" fill="none" style={{ opacity: 0, pointerEvents: "none" }} ref={toRimPathRef as any} />
+
+                {/* Rim highlight lights up on hit then slowly depulses until rotation */}
+                <motion.circle
+                  key={`goal-${currentProfile}`}
+                  cx={rimCx as any}
+                  cy={rimCy as any}
+                  r="7"
+                  fill="none"
+                  stroke="url(#edgeNeon)"
+                  strokeWidth="2.6"
+                  initial={{ opacity: 0, scale: 0.92, filter: "url(#neonGlow)" }}
+                  animate={
+                    prefersReducedMotion || isRotatingPaused
+                      ? { opacity: 0 }
+                      : {
+                          opacity: [0, 0, 1, 0],
+                          scale: [0.92, 0.95, 1.05, 0.98],
+                          strokeWidth: [2.6, 2.6, 3.5, 2.8],
+                        }
+                  }
+                  transition={{
+                    duration: ROTATION_MS / 1000,
+                    ease: "easeInOut",
+                    times: [0, goalHalfway, goalOn, 1],
+                  }}
+                />
+                {/* Shockwave on hit */}
+                <motion.circle
+                  key={`shockwave-${currentProfile}`}
+                  cx={rimCx as any}
+                  cy={rimCy as any}
+                  r="7"
+                  fill="none"
+                  stroke="url(#edgeNeon)"
+                  initial={{ opacity: 0, scale: 1, strokeWidth: 4 }}
+                  animate={
+                    prefersReducedMotion || isRotatingPaused
+                      ? { opacity: 0 }
+                      : { opacity: [0, 0.5, 0], scale: [1, 1.8, 1.8], strokeWidth: [4, 0, 0] }
+                  }
+              transition={{
+                    duration: 800 / 1000,
+                    ease: "easeOut",
+                    delay: (ROTATION_MS / 1000) * goalOn,
+                  }}
+                />
+              </svg>
+
+              {/* Removed node dots for cleaner minimal aesthetic */}
           </div>
+            {/* --- END Agent Constellation --- */}
 
           <div className="container px-4 md:px-6 relative">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-left mb-12"
-            >
-              <motion.div
-                key={`audience-pill-${currentProfile}`}
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.25 }}
-                className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-3 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-2xl bg-white/70 dark:bg-white/10"
+                transition={{ duration: 0.8 }}
+                className="text-left mb-12"
               >
-                <span
-                  className={`w-6 h-6 rounded-full text-white flex items-center justify-center bg-gradient-to-r ${rotatingContent[currentProfile].gradient}`}
+            <motion.div
+                  key={`audience-pill-${currentProfile}`}
+                  initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.25 }}
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-3 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-2xl bg-white/70 dark:bg-white/10"
                 >
-                  {rotatingContent[currentProfile].icon}
-                </span>
-                <span className="text-xs font-bold tracking-wider uppercase text-gray-900 dark:text-white">
-                  for {rotatingContent[currentProfile].industry}
-                </span>
-              </motion.div>
+                  <span
+                    className={`w-6 h-6 rounded-full text-white flex items-center justify-center bg-gradient-to-r ${rotatingContent[currentProfile].gradient}`}
+                  >
+                    {rotatingContent[currentProfile].icon}
+                  </span>
+                  <span className="text-xs font-bold tracking-wider uppercase text-gray-900 dark:text-white">
+                    for {rotatingContent[currentProfile].industry}
+                  </span>
+                </motion.div>
               <motion.h1
-                className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight mb-6 leading-[1.15] pb-1"
+                  className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight mb-6 leading-[1.15] pb-1"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
               >
-                <div className="text-foreground">Multi-agent Solutions</div>
-                <div className="relative overflow-visible flex items-center whitespace-nowrap" aria-live="polite" aria-atomic="true">
-                  <span className="text-muted-foreground mr-2">for</span>
-                  <div className="relative">
-                    <motion.div
-                      key={currentProfile}
-                      className="text-gradient-dynamic inline-block whitespace-nowrap leading-none"
-                      initial={{ y: 50, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -50, opacity: 0 }}
-                      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    >
-                      {rotatingContent[currentProfile].headline}
-                    </motion.div>
-                    <motion.span
-                      key={`underline-${currentProfile}`}
-                      className="absolute left-0 -bottom-1 h-1 rounded-full bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500"
-                      initial={{ width: 0, opacity: 0.6 }}
-                      animate={prefersReducedMotion || isRotatingPaused ? { width: 0 } : { width: "100%" }}
-                      transition={{ duration: ROTATION_MS / 1000, ease: "linear" }}
-                    />
-                  </div>
+                  <div className="text-foreground">Multi-agent Solutions</div>
+                  <div className="relative overflow-visible flex flex-col md:flex-row md:flex-wrap md:items-center min-h-[3.6rem] md:min-h-[3rem]" aria-live="polite" aria-atomic="true">
+                    <span className="text-muted-foreground block w-full md:inline md:w-auto md:mr-2">for</span>
+                    <div className="relative w-full md:flex-1 md:min-w-0">
+                  <motion.div
+                    key={currentProfile}
+                        className="text-gradient-dynamic block leading-tight whitespace-normal break-words"
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -50, opacity: 0 }}
+                        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  >
+                    {rotatingContent[currentProfile].headline}
+                  </motion.div>
+                      {/* underline tracer removed as requested */}
+                    </div>
                 </div>
               </motion.h1>
 
-              <motion.h3
+                <motion.h3
                 key={`desc-${currentProfile}`}
-                className="text-lg text-muted-foreground mb-8 font-semibold leading-relaxed md:text-xl whitespace-nowrap"
+                  className="text-lg text-muted-foreground mb-8 font-semibold leading-relaxed md:text-xl"
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -30, scale: 0.95 }}
@@ -305,158 +478,171 @@ export default function LandingPage() {
                 }}
               >
                 {rotatingContent[currentProfile].description}
-              </motion.h3>
+                </motion.h3>
 
               <motion.div
-                className="flex flex-col sm:flex-row gap-4 mb-12"
+                  className="flex flex-col sm:flex-row gap-4 mb-20 md:mb-24"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
               >
                 <Button
-                  asChild
+                    asChild
                   size="lg"
-                  className={`relative rounded-full h-14 px-10 text-lg font-semibold overflow-hidden transition-all duration-300 magnetic-hover bg-gradient-to-r ${
-                    rotatingContent[currentProfile].gradient
-                  } hover:shadow-2xl hover:scale-105`}
-                >
-                  <Link href="#journeys" className="flex items-center justify-center text-white">
-                    <div className="absolute bottom-0 left-0 h-1 w-full bg-white/20">
-                      <motion.div
-                        key={`progress-${currentProfile}`}
-                        initial={{ width: 0 }}
-                        animate={prefersReducedMotion || isRotatingPaused ? { width: 0 } : { width: "100%" }}
-                        transition={{ duration: ROTATION_MS / 1000, ease: "linear" }}
-                        className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500"
-                      />
-                    </div>
-                    <motion.span
-                      key={`cta-text-${currentProfile}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {rotatingContent[currentProfile].cta}
-                    </motion.span>
-                    <ArrowRight className="ml-2 size-5" />
-                  </Link>
+                    className={`relative rounded-full h-14 px-10 py-0 text-lg font-semibold overflow-hidden transition-all duration-300 magnetic-hover bg-gradient-to-r ${
+                      rotatingContent[currentProfile].gradient
+                    } hover:shadow-2xl hover:scale-105`}
+                  >
+                    <Link href="#journeys" className="flex items-center justify-center text-white h-14">
+                      <div className="absolute bottom-0 left-0 h-1 w-full bg-white/20">
+                        <motion.div
+                          key={`progress-${currentProfile}`}
+                          initial={{ width: 0 }}
+                          animate={prefersReducedMotion || isRotatingPaused ? { width: 0 } : { width: "100%" }}
+                          transition={{ duration: TRACER_MS / 1000, ease: "linear" }}
+                          className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
+                        />
+                      </div>
+                  <motion.span
+                    key={`cta-text-${currentProfile}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                      className="leading-none text-center whitespace-nowrap"
+                  >
+                    {rotatingContent[currentProfile].cta}
+                  </motion.span>
+                    <ArrowRight className="ml-2 size-5 flex-shrink-0" />
+                    </Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
                   variant="outline"
-                  className="rounded-full h-14 px-10 text-lg font-medium glass-card bg-transparent magnetic-hover"
+                    className="rounded-full h-14 px-10 py-0 text-lg font-medium glass-card bg-transparent magnetic-hover"
                 >
-                  <Link href="https://app.lemcal.com/@fredjin/30-minutes">Book a demo</Link>
-                </Button>
-                <Button
-                  size="icon"
-                  className="rounded-full"
-                  onClick={() => setIsRotatingPaused((v) => !v)}
-                  aria-label={isRotatingPaused ? "Resume hero rotation" : "Pause hero rotation"}
-                >
-                  {isRotatingPaused ? <Play className="size-[18px]" /> : <Pause className="size-[18px]" />}
+                    <Link href="https://app.lemcal.com/@fredjin/30-minutes" className="h-14 flex items-center">Book a demo</Link>
                 </Button>
               </motion.div>
 
-              {/* Redesigned Feature Showcase List */}
-              <motion.div
-                className="space-y-4 mt-8"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  visible: {
-                    transition: {
-                      staggerChildren: 0.2,
-                      delayChildren: 0.8,
+                {/* Redesigned Feature Showcase List */}
+                <motion.div
+                  className="space-y-4 mt-16 md:mt-20"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    visible: {
+                      transition: {
+                        staggerChildren: 0.2,
+                        delayChildren: 0.8,
+                      },
                     },
-                  },
-                }}
-              >
-                {[
-                  {
-                    icon: <Cpu className="size-5 text-white" />,
-                    gradient: "from-blue-500 to-cyan-500",
-                    boldText: "A New Data Compute Platform",
-                    regularText: "built from the ground up for multi-agents.",
-                  },
-                  {
-                    icon: <Shield className="size-5 text-white" />,
-                    gradient: "from-blue-500 to-cyan-500",
-                    boldText: "Secure, owned and customized models",
-                    regularText: "that evolve with your business.",
-                  },
-                  {
-                    icon: <Zap className="size-5 text-white" />,
-                    gradient: "from-blue-500 to-cyan-500",
-                    boldText: "Production ready on 100% sovereign data infrastructure",
-                    regularText: "— on-prem or hybrid.",
-                  },
-                ].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    className="flex items-center gap-4"
-                    variants={{
-                      hidden: { opacity: 0, x: -20 },
-                      visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
-                    }}
-                  >
-                    <div
-                      className={`w-10 h-10 bg-gradient-to-br ${item.gradient} rounded-full flex items-center justify-center flex-shrink-0`}
+                  }}
+                >
+                  {[{
+                      icon: <Cpu className="size-5 text-white" />,
+                      gradient: "from-blue-500 to-cyan-500",
+                      boldText: "A New Data Compute Platform",
+                      regularText: "built from the ground up for multi-agents.",
+                    },
+                    {
+                      icon: <Shield className="size-5 text-white" />,
+                      gradient: "from-blue-500 to-cyan-500",
+                      boldText: "Secure, owned and customized models",
+                      regularText: "that evolve with your business.",
+                    },
+                    {
+                      icon: <Zap className="size-5 text-white" />,
+                      gradient: "from-blue-500 to-cyan-500",
+                      boldText: "Production ready on 100% sovereign data infrastructure",
+                      regularText: "(on‑prem or hybrid).",
+                    },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={i}
+                      className="flex items-center gap-4"
+                      variants={{
+                        hidden: { opacity: 0, x: -20 },
+                        visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
+                      }}
                     >
-                      {item.icon}
-                    </div>
-                    <p className="text-base text-gray-800 dark:text-gray-200">
-                      <span className="font-semibold text-gray-900 dark:text-white">{item.boldText}</span>{" "}
-                      <span className="text-muted-foreground">{item.regularText}</span>
-                    </p>
-                  </motion.div>
-                ))}
-              </motion.div>
+                      <div
+                        className={`w-10 h-10 bg-gradient-to-br ${item.gradient} rounded-full flex items-center justify-center flex-shrink-0`}
+                      >
+                        {item.icon}
+                      </div>
+                      <p className="text-base text-gray-800 dark:text-gray-200">
+                        <span className="font-semibold text-gray-900 dark:text-white">{item.boldText}</span>{" "}
+                        <span className="text-muted-foreground">{item.regularText}</span>
+                      </p>
+                    </motion.div>
+                  ))}
+                </motion.div>
             </motion.div>
           </div>
         </section>
+        </div>
 
-        <section className="w-full py-20 md:py-32 relative overflow-hidden bg-gray-50 dark:bg-gray-900 -mt-32 pt-40">
+        <section className="w-full py-20 md:py-32 relative overflow-hidden bg-gray-50 dark:bg-gray-900 pt-40">
           <div className="container px-4 md:px-6 relative">
-            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Section hero */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight text-gradient-dynamic">
+                
+              </h2>
+            </motion.div>
+            <div className="relative max-w-6xl mx-auto px-6 py-8 md:px-10 md:py-12 lg:px-14 lg:py-14 rounded-3xl shadow-2xl gradient-border">
+              {/* Split contrast backgrounds (desktop only) */}
+              <div className="hidden md:block absolute inset-0 pointer-events-none rounded-3xl" aria-hidden>
+                <div className="absolute inset-y-0 left-0 right-1/2 rounded-l-3xl rounded-r-none bg-slate-900/85"></div>
+                <div className="absolute inset-y-0 left-1/2 right-0 rounded-r-3xl rounded-l-none bg-white/90 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/50"></div>
+                <div className="absolute inset-y-6 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-slate-400/30 dark:via-white/10 to-transparent"></div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-10 md:gap-12 lg:gap-16 relative z-10">
               {/* Problem Panel - Dark "Shadow" Side */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, type: "spring" }}
-                className="bg-[#1A1D23] border border-[#333740] rounded-2xl p-8 space-y-6"
+                className="relative md:bg-transparent bg-slate-900/90 border-none md:rounded-none rounded-2xl md:p-0 p-6 md:pl-8 space-y-8 md:border-l-4 border-l-0 border-red-300/60 dark:md:border-red-500/40 text-white shadow-xl md:shadow-none"
               >
                 <Badge
                   className="rounded-full px-4 py-2 text-sm font-bold bg-red-500/10 text-red-400 border-red-500/20"
                   variant="outline"
                 >
-                  The Gap (Today)
+                  The Gap
                 </Badge>
 
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
-                  Today's AI Tools Flaws
+                  AI Adoption Challenges
                 </h2>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {[
                     {
-                      text: "Generic models miss your user and operational context",
-                      icon: "❓",
-                    },
-                    {
-                      text: "Black-box AI → no control or accountability",
+                      text: "Black-box AI → No control, accountability, or transparency. Lacks auditability and oversight.",
                       icon: "🔒",
                     },
                     {
-                      text: "Analytics queues → insights after outcomes",
-                      icon: "⏰",
+                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don't own creates major risks.",
+                      icon: "🔐",
+                    },
+                    {
+                      text: "Risky Integrations → Complex, fragile, and costly to stitch together siloed, outdated systems into a functional AI data flow.",
+                      icon: "⚠️",
                     },
                   ].map((item, i) => (
                     <motion.div
                       key={i}
-                      className="flex items-start gap-4"
+                      className="flex items-start gap-5"
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -465,7 +651,7 @@ export default function LandingPage() {
                       <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-red-400 text-sm">{item.icon}</span>
                       </div>
-                      <p className="text-gray-300 font-medium leading-relaxed">{item.text}</p>
+                      <p className="text-slate-200 font-medium [text-wrap:balance] leading-7 md:leading-8 text-[clamp(12px,2.8vw,16px)] md:text-[clamp(14px,1.05vw,16px)]">{item.text}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -477,37 +663,39 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, type: "spring", delay: 0.2 }}
-                className="bg-white border border-gray-200 rounded-2xl p-8 space-y-6 shadow-lg"
+                className="relative md:bg-transparent bg-white border-none md:rounded-none rounded-2xl md:p-0 p-6 md:pl-8 space-y-8 md:border-l-4 border-l-0 border-green-300/60 dark:md:border-green-500/40 shadow-xl md:shadow-none"
               >
-                <Badge
-                  className="rounded-full px-4 py-2 text-sm font-bold bg-gray-100 text-gray-700 border-gray-200"
+                <Button
+                  asChild
+                  size="sm"
                   variant="outline"
+                  className="rounded-full h-10 px-6 text-sm font-medium glass-card bg-transparent magnetic-hover"
                 >
-                  Our Bridge (The Core)
-                </Badge>
+                  <Link href="#contact">CEF SUITE</Link>
+                </Button>
 
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
-                  <span className="text-gradient-dynamic underline decoration-2 underline-offset-8">Secure</span> Multi-Agent Solution
+                  Own the Entire Stack
                 </h2>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {[
                     {
-                      text: "Custom, Open-source models that evolve",
-                      icon: "🔄",
-                    },
-                    {
-                      text: "Full Control, Privacy & Transparency",
+                      text: "Full Control → Real-time dynamic agent orchestration with secure and fully auditable execution at every step.",
                       icon: "🛡️",
                     },
                     {
-                      text: "Easy, fast with Zero leakage",
-                      icon: "⚡",
+                      text: "Dedicated Data Infrastructure → Out-of-the-box, optimized for speed and cost. On-prem, edge, or hybrid deployments.",
+                      icon: "🗄️",
+                    },
+                    {
+                      text: "Open Source Models → Models you own and tune to your business needs, continuously evolving with your data and your use cases.",
+                      icon: "🔄",
                     },
                   ].map((item, i) => (
                     <motion.div
                       key={i}
-                      className="flex items-start gap-4"
+                      className="flex items-start gap-5"
                       initial={{ opacity: 0, x: 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -516,37 +704,495 @@ export default function LandingPage() {
                       <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-green-600 text-sm">{item.icon}</span>
                       </div>
-                      <p className="text-gray-700 font-medium leading-relaxed">{item.text}</p>
+                      <p className="text-gray-700 font-medium [text-wrap:balance] leading-7 md:leading-8 text-[clamp(12px,2.8vw,16px)] md:text-[clamp(14px,1.05vw,16px)]">{item.text}</p>
                     </motion.div>
                   ))}
                 </div>
 
 
-              </motion.div>
+            </motion.div>
+              </div>
             </div>
+          </div>
+        </section>
 
+        {/* Versions Section - Ship Better Versions */}
+        <section className="w-full py-20 md:py-28 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 relative overflow-hidden">
+          <div className="container px-4 md:px-6 relative">
+                <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-16 md:mb-20 ml-0 w-full max-w-4xl"
+            >
+              <div className="mb-4">
+                <div className="inline-flex items-center gap-2" aria-label="CEF logo">
+                  <svg className="h-6 w-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" role="img">
+                    <rect x="2" y="3" width="16" height="14" rx="3" fill="#2563EB"/>
+                    <rect x="5" y="6" width="10" height="2" rx="1" fill="white"/>
+                    <rect x="5" y="9" width="7" height="2" rx="1" fill="white"/>
+                    <rect x="5" y="12" width="10" height="2" rx="1" fill="white"/>
+                  </svg>
+                  <svg className="h-4 w-auto" viewBox="0 0 60 16" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CEF wordmark">
+                    <text x="0" y="13" fontFamily="Inter, system-ui, Arial, sans-serif" fontWeight="800" fontSize="14" fill="#0F172A">CEF</text>
+                  </svg>
+                </div>
+              </div>
+              <h2 className="text-left text-4xl md:text-6xl font-display-bold tracking-tight leading-[1.1] text-slate-900 dark:text-white [text-wrap:balance]">
+                Turn AI into <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Agile Data Products</span>
+              </h2>
+              <p className="mt-6 text-lg md:text-xl text-muted-foreground font-medium text-left italic">
+                Make AI a product, not plumbing. One place to version, test, and ship AI logic: replay runs, gate releases on KPIs, and roll back in a click. Your models, prompts, and policies evolve like software: fast, iterative, and always moving forward.
+              </p>
+              <div className="mt-6">
+                <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
+                  <Link href="https://app.lemcal.com/@fredjin/30-minutes">
+                    Book a demo
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+                </motion.div>
+
+            {/* Neat SVG - floating cards (no background cover) */}
+            {false && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center mt-12"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="relative max-w-5xl mx-auto overflow-visible"
             >
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl"
-              >
-                <Link href="https://app.lemcal.com/@fredjin/30-minutes">
-                  Book a demo
-                  <ArrowRight className="ml-2 size-4" />
-                </Link>
-              </Button>
+              <svg viewBox="0 0 1200 420" className="w-full h-auto block">
+                <defs>
+                  <linearGradient id="gBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#60A5FA" />
+                    <stop offset="100%" stopColor="#22D3EE" />
+                  </linearGradient>
+                  <linearGradient id="cardLight" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.98" />
+                    <stop offset="100%" stopColor="#F6FAFF" stopOpacity="0.94" />
+                  </linearGradient>
+                  <radialGradient id="halo" cx="50%" cy="50%" r="60%">
+                    <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.25" />
+                    <stop offset="60%" stopColor="#22D3EE" stopOpacity="0.16" />
+                    <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+                  </radialGradient>
+                  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+                    <feMerge>
+                      <feMergeNode in="coloredBlur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <filter id="cardShadow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="14" stdDeviation="14" floodOpacity="0.18" />
+                  </filter>
+                  <linearGradient id="railGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#CBD5E1" />
+                    <stop offset="50%" stopColor="#93C5FD" />
+                    <stop offset="100%" stopColor="#A7F3D0" />
+                  </linearGradient>
+                  <style>{`
+                    .v6-details{opacity:0;transition:opacity .25s ease}
+                    .v6:hover + .v6-details{opacity:1}
+                    @keyframes promoteMove{0%{transform:translateX(0)}50%{transform:translateX(40px)}100%{transform:translateX(0)}}
+                    .v6:hover + .v6-details .promote{animation:promoteMove 1.2s linear infinite}
+                  `}</style>
+                </defs>
+
+                {/* Halo behind center */}
+                <g transform="translate(600,210)">
+                  <ellipse cx="0" cy="0" rx="240" ry="120" fill="url(#halo)" />
+                </g>
+
+                {/* Left card (prior) */}
+                <g transform="translate(130,90)" filter="url(#cardShadow)" opacity="0.96">
+                  <rect rx="26" ry="26" width="320" height="250" fill="url(#cardLight)" stroke="#E2E8F0" />
+                  <text x="24" y="44" fill="#0F172A" fontSize="26" fontFamily="Inter, system-ui" fontWeight="800">Version 4 (Previous)</text>
+                  <text x="24" y="92" fill="#0F172A" fontSize="17" fontFamily="Inter" opacity="0.9">
+                    <tspan x="24" dy="0">Streams: 3 connected,</tspan>
+                    <tspan x="24" dy="28">Policy Pass: ✓,</tspan>
+                    <tspan x="24" dy="28">Impact: −18% handle time,</tspan>
+                    <tspan x="24" dy="28">Time‑to‑Promote: 4h 23m,</tspan>
+                    <tspan x="24" dy="28">Replay: Available</tspan>
+                  </text>
+                </g>
+
+                {/* Middle card (current, highlighted) */}
+                <g transform="translate(430,60)" filter="url(#cardShadow)">
+                  <rect rx="32" ry="32" width="340" height="290" fill="url(#cardLight)" stroke="url(#gBlue)" strokeWidth="2" filter="url(#glow)" />
+                  <text x="28" y="54" fill="#0F172A" fontSize="28" fontFamily="Inter, system-ui" fontWeight="900">Version 5 (Current)</text>
+                  <text x="28" y="102" fill="#0F172A" fontSize="17" fontFamily="Inter" opacity="0.92">
+                    <tspan x="28" dy="0">Streams: 5 connected,</tspan>
+                    <tspan x="28" dy="28">Policy Pass: ✓,</tspan>
+                    <tspan x="28" dy="28">Impact: +8.2% retention,</tspan>
+                    <tspan x="28" dy="28">Time‑to‑Promote: 3h 12m,</tspan>
+                    <tspan x="28" dy="28">Replay: Available</tspan>
+                  </text>
+                </g>
+
+                {/* Right card (candidate) */}
+                <g className="v6" transform="translate(740,90)" filter="url(#cardShadow)" opacity="0.98">
+                  <rect rx="26" ry="26" width="320" height="250" fill="url(#cardLight)" stroke="#E2E8F0" />
+                  <text x="24" y="44" fill="#0F172A" fontSize="26" fontFamily="Inter, system-ui" fontWeight="800">Version 6 (Candidate)</text>
+                  <text x="24" y="92" fill="#0F172A" fontSize="17" fontFamily="Inter" opacity="0.9">
+                    <tspan x="24" dy="0">Streams: 5 connected,</tspan>
+                    <tspan x="24" dy="28">Policy Check: Running…,</tspan>
+                    <tspan x="24" dy="28">Impact: +6.1% CTR (p&lt;0.05),</tspan>
+                    <tspan x="24" dy="28">Time‑to‑Promote: 2h 47m,</tspan>
+                    <tspan x="24" dy="28">Status: Promoting</tspan>
+                  </text>
+                </g>
+                {/* V6 hover details */}
+                <g className="v6-details" transform="translate(740,90)">
+                  <rect x="340" y="20" rx="16" ry="16" width="260" height="140" fill="#FFFFFF" opacity="0.96" stroke="#BFDBFE" />
+                  <text x="360" y="56" fill="#0F172A" fontSize="16" fontFamily="Inter" fontWeight="700">Policy</text>
+                  <text x="360" y="82" fill="#0F172A" fontSize="14" fontFamily="Inter">PII compliance ✓</text>
+                  <text x="360" y="104" fill="#0F172A" fontSize="14" fontFamily="Inter">Cost cap ✓</text>
+                  <text x="360" y="126" fill="#0F172A" fontSize="14" fontFamily="Inter">Eval metrics ✓</text>
+                  {/* promote animation */}
+                  <line x1="360" y1="148" x2="580" y2="148" stroke="url(#gBlue)" strokeWidth="3" strokeLinecap="round" />
+                  <circle className="promote" cx="360" cy="148" r="6" fill="#3B82F6" />
+                </g>
+
+                {/* Rail */}
+                <line x1="120" y1="370" x2="1080" y2="370" stroke="url(#railGrad)" strokeWidth="3" strokeLinecap="round" />
+                <circle cx="600" cy="370" r="16" fill="#FFFFFF" stroke="url(#gBlue)" strokeWidth="2" />
+                <path d="M600 362 a8 8 0 1 0 0 16" fill="none" stroke="#3B82F6" strokeWidth="2" />
+                <path d="M606 368 l4 -4 v8 z" fill="#3B82F6" />
+              </svg>
+              </motion.div>
+            )}
+
+            {/* Polished HTML cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="relative w-full"
+              ref={versionsRef}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+                <motion.div style={{ scale: v4Scale, opacity: v4Opacity }}
+                  initial={{ scale: 1, opacity: 0.98 }}
+                  whileInView={{ opacity: 1 }}
+                  whileHover={{ scale: 1.02 }}
+                  viewport={{ once: false, amount: 0.4 }}
+                  className="group rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-md border border-slate-200/70 dark:border-slate-700/60 shadow-xl p-6 transition-transform"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-display-bold text-lg text-slate-900 dark:text-white">Version 5 (Previous)</h3>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Legacy</span>
+                  </div>
+                  <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-2"><Cog className="size-4 text-slate-600" /><span><span className="font-semibold">What We Built:</span> AI agent suite with <strong>2</strong> real‑time data streams (community feedback + customer activity).</span></div>
+                    <div className="flex items-center gap-2"><Shield className="size-4 text-emerald-600" /><span><span className="font-semibold">Infrastructure:</span> Secured on dedicated infrastructure with full audit trail before any changes go live.</span></div>
+                    <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Proven Results:</span> <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+8.2%</span> lift in customer engagement across all users.</span></div>
+                    <div className="flex items-center gap-2"><Check className="size-4 text-emerald-600" /><span><span className="font-semibold">Status:</span> Successfully scaled into production in <span className="font-semibold">Q2 2025</span>.</span></div>
+                    <p className="text-xs text-muted-foreground mt-3 italic">Proof that AI streaming could safely scale into production.</p>
+                  </div>
+                </motion.div>
+
+                <motion.div style={{ scale: v5Scale, opacity: v5Opacity }}
+                  initial={{ scale: 1, opacity: 0.98 }}
+                  whileInView={{ scale: 1.06, opacity: 1 }}
+                  viewport={{ once: false, amount: 0.4 }}
+                  whileHover={{ scale: 1.07 }}
+                  className="group relative rounded-2xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-amber-300/60 dark:border-amber-400/40 shadow-2xl p-8 md:p-10 transition-transform gradient-border"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-display-bold text-lg text-slate-900 dark:text-white">Version 6 (Current)</h3>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 ring-1 ring-brand-accent/40">Live in Production</span>
+                  </div>
+                  <div className="space-y-3 text-sm text-slate-800 dark:text-slate-200">
+                    <div className="flex items-start gap-2"><Cog className="size-4 mt-1 text-slate-700" /><span><span className="font-semibold">What's Working:</span> Your AI agents now handle optimized multi‑agent workflows, scaled to dedicated clusters.</span></div>
+                    <div className="flex items-start gap-2"><Shield className="size-4 mt-1 text-cyan-600" /><span><span className="font-semibold">Governance:</span> Performance‑gated promotions ensure changes deploy only after hitting targets.</span></div>
+                    <div className="group flex items-start gap-2 pl-3 border-l-2 border-brand-accent/40">
+                      <ArrowUpRight className="size-4 mt-0.5 text-brand-accent transition-transform group-hover:translate-x-0.5" />
+                      <span className="font-semibold"><span className="font-semibold">Proven Impact:</span> <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+6.1%</span> conversion uplift (from onboarding funnel test).</span>
+                    </div>
+                    <div className="group flex items-start gap-2 pl-3 border-l-2 border-brand-accent/40">
+                      <Trophy className="size-4 mt-0.5 text-brand-accent" />
+                      <span className="font-semibold">Confirmed business impact: <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+$1.2M</span> in ARR directly attributed.</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap pt-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center gap-2 rounded-md px-2 py-1 bg-brand-accent/10 text-slate-800 dark:text-slate-200 border border-brand-accent/20 hover:bg-brand-accent/15 transition">
+                              <RotateCcw className="size-4" />
+                              Replay
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>Re-run any decision path with identical inputs/outputs for verification.</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center gap-2 rounded-md px-2 py-1 bg-brand-accent/10 text-slate-800 dark:text-slate-200 border border-brand-accent/20 hover:bg-brand-accent/15 transition">
+                              <History className="size-4" />
+                              Audit
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>Immutable, step‑level logs provide a complete chain of custody.</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 italic">Results validated before rollout, not after.</p>
+                  </div>
+                </motion.div>
+
+                <motion.div style={{ scale: v6Scale, opacity: v6Opacity }}
+                  initial={{ scale: 1, opacity: 0.98 }}
+                  whileInView={{ scale: 1.03, opacity: 1 }}
+                  viewport={{ once: false, amount: 0.4 }}
+                  whileHover={{ scale: 1.04 }}
+                  className="group relative rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-md border border-slate-200/70 dark:border-slate-700/60 shadow-xl p-6 transition-transform"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-display-bold text-lg text-slate-900 dark:text-white">Version 7 (Candidate)</h3>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">In A/B Test</span>
+                  </div>
+                  <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-2"><Lightbulb className="size-4 text-yellow-500" /><span><span className="font-semibold">What's New:</span> Real‑time customer mood detection + computer vision (CV) triggers for precision response routing.</span></div>
+                    <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Efficiency:</span> ~<span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">15%</span> lower infrastructure costs (via runtime tuning + GPU pooling).</span></div>
+                    <div className="flex items-center gap-2"><ArrowUpRight className="size-4 text-brand-accent" /><span className="font-semibold"><span className="font-semibold">Early Results:</span> ~<span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">20%</span> fewer customers abandon in high‑risk situations (thanks to precise routing).</span></div>
+                    <div className="flex items-center gap-2"><Rocket className="size-4 text-slate-700" /><span><span className="font-semibold">Deployment:</span> Auto‑rolling deployment covers <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">5%</span> of traffic with automated, instant rollback guardrails.</span></div>
+                    <p className="text-xs text-muted-foreground mt-2 italic">Lower infra costs and fewer customer drop‑offs, with risk‑limited rollout.</p>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* bottom rail removed */}
             </motion.div>
+
+            {/* Proof stripe removed per request */}
+
+            {/* Unboxed features removed; merged into How It Works above */}
+            
+            {/* Starter Packs Section */}
+            {false && (
+            <section className="w-full py-20 md:py-28 bg-white dark:bg-gray-950">
+               <div className="container px-4 md:px-6">
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }}
+                   whileInView={{ opacity: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ duration: 0.6 }}
+                   className="text-center mb-16"
+                 >
+                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800/50 mb-6">
+                     <span className="text-sm font-bold">Pick a Journey</span>
+                   </div>
+                   <h2 className="text-4xl md:text-5xl font-display-bold tracking-tight mb-4 text-slate-900 dark:text-white">
+                     <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Outcome-first starter packs</span>
+                   </h2>
+                   <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+                     Outcome-first starter packs on the same core: Onboard → Reason → Act → Govern.
+                   </p>
+                 </motion.div>
+                
+                 {/* 2x2 Grid of Equal Cards */}
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }}
+                   whileInView={{ opacity: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ duration: 0.6, delay: 0.1 }}
+                   className="grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-fr"
+                 >
+                   {/* Gaming */}
+                   <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                     <div className="relative h-52 bg-gray-100">
+                       <img src="/gaming-dashboard-analytics.png" alt="Gaming dashboard" className="w-full h-full object-cover" />
+                       <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
+                         <Gamepad2 className="w-4 h-4" />
+                         <span className="text-sm font-semibold">Gaming: Player Retention & Trust/Safety</span>
+                       </div>
+                     </div>
+                     <div className="p-6 flex-1 flex flex-col">
+                       <div className="border-l-4 border-slate-300 pl-4 mb-6">
+                         <h3 className="text-2xl font-display-bold text-slate-900 mb-2">Personalized Game Experiences</h3>
+                         <p className="text-slate-600 text-base">A dedicated AI concierge for every player, turning real‑time behavior into adaptive gameplay.</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-blue-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">Triggers:</h4>
+                         <p className="text-slate-600 text-base">Rage‑quit patterns, loss streaks, toxic chat spikes, cohort churn risk, social/Discord sentiment</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-green-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">What's inside:</h4>
+                         <ul className="space-y-2 text-slate-700">
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Frustration Detector</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>T&S Sentinel</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Matchmaking Concierge</li>
+                         </ul>
+                       </div>
+ 
+                       <div className="border-l-4 border-purple-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">KPIs:</h4>
+                         <div className="flex flex-wrap gap-2">
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">Churn delta</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Session recovery</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">Abuse reports</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">CSAT after session</span>
+                         </div>
+                       </div>
+ 
+                       <div className="mt-auto">
+                         <a className="block w-full text-center rounded-xl border border-slate-300 py-3 text-slate-800 hover:bg-slate-50" href="#">View starter pack</a>
+                       </div>
+                     </div>
+                   </div>
+ 
+                   {/* Support */}
+                   <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                     <div className="relative h-52 bg-gray-100">
+                       <img src="/customer-support-dashboard.png" alt="Support dashboard" className="w-full h-full object-cover" />
+                       <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
+                         <Headphones className="w-4 h-4" />
+                         <span className="text-sm font-semibold">Support: Conversation Intelligence</span>
+                       </div>
+                     </div>
+                     <div className="p-6 flex-1 flex flex-col">
+                       <div className="border-l-4 border-slate-300 pl-4 mb-6">
+                         <h3 className="text-2xl font-display-bold text-slate-900 mb-2">Proactive Customer Support</h3>
+                         <p className="text-slate-600 text-base">Understand user needs so well, you'll never send a satisfaction survey again.</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-blue-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">Triggers:</h4>
+                         <p className="text-slate-600 text-base">Inbound call/chat, long handle time, repeat contacts, VIP risk, compliance terms mentioned</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-green-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">What's inside:</h4>
+                         <ul className="space-y-2 text-slate-700">
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Live Transcriber</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Intent & Compliance Classifier</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Coach/QA Summarizer</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Next‑Best‑Action Router</li>
+                         </ul>
+                       </div>
+ 
+                       <div className="border-l-4 border-purple-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">KPIs:</h4>
+                         <div className="flex flex-wrap gap-2">
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">AHT</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">FCR</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">QA pass rate</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Deflected escalations</span>
+                         </div>
+                       </div>
+ 
+                       <div className="mt-auto">
+                         <a className="block w-full text-center rounded-xl border border-slate-300 py-3 text-slate-800 hover:bg-slate-50" href="#">View starter pack</a>
+                       </div>
+                     </div>
+                   </div>
+ 
+                   {/* Communities */}
+                   <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                     <div className="relative h-52 bg-gray-100">
+                       <img src="/web3-community-dashboard.png" alt="Community dashboard" className="w-full h-full object-cover" />
+                       <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
+                         <Globe2 className="w-4 h-4" />
+                         <span className="text-sm font-semibold">Communities & Web3: Health & Growth</span>
+                       </div>
+                     </div>
+                     <div className="p-6 flex-1 flex flex-col">
+                       <div className="border-l-4 border-slate-300 pl-4 mb-6">
+                         <h3 className="text-2xl font-display-bold text-slate-900 mb-2">Real‑time Community Sentiment</h3>
+                         <p className="text-slate-600 text-base">Instantly detect sentiment shifts and prevent toxic behavior before it spreads.</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-blue-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">Triggers:</h4>
+                         <p className="text-slate-600 text-base">Topic surge, whale wallet activity, campaign execution, governance proposal, concern clusters</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-green-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">What's inside:</h4>
+                         <ul className="space-y-2 text-slate-700">
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Topic Surge Monitor</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Cohort Growth Planner</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Risk Router</li>
+                         </ul>
+                       </div>
+ 
+                       <div className="border-l-4 border-purple-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">KPIs:</h4>
+                         <div className="flex flex-wrap gap-2">
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">Engagement</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Cohort retention</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Campaign conversion</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Mod workload</span>
+                         </div>
+                       </div>
+ 
+                       <div className="mt-auto">
+                         <a className="block w-full text-center rounded-xl border border-slate-300 py-3 text-slate-800 hover:bg-slate-50" href="#">View starter pack</a>
+                       </div>
+                     </div>
+                   </div>
+ 
+                   {/* Computer Vision */}
+                   <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                     <div className="relative h-52 bg-gray-100">
+                       <img src="/ai-customer-intelligence-dashboard.png" alt="Computer Vision" className="w-full h-full object-cover" />
+                       <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
+                         <Cpu className="w-4 h-4" />
+                         <span className="text-sm font-semibold">Computer Vision: Real‑time Anomaly Detection</span>
+                       </div>
+                     </div>
+                     <div className="p-6 flex-1 flex flex-col">
+                       <div className="border-l-4 border-slate-300 pl-4 mb-6">
+                         <h3 className="text-2xl font-display-bold text-slate-900 mb-2">Computer Vision Ops</h3>
+                         <p className="text-slate-600 text-base">Ingest drone/CCTV video into RAFT for real‑time detection and automated alerts.</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-blue-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">Triggers:</h4>
+                         <p className="text-slate-600 text-base">Video frames, safety events, zone breaches, object detections</p>
+                       </div>
+ 
+                       <div className="border-l-4 border-green-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">What's inside:</h4>
+                         <ul className="space-y-2 text-slate-700">
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Streaming ingest</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>CV Detection Agent</li>
+                           <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span>Alerting & Dashboards</li>
+                         </ul>
+                       </div>
+ 
+                       <div className="border-l-4 border-purple-500 pl-4 mb-6">
+                         <h4 className="font-semibold text-slate-900 mb-2">KPIs:</h4>
+                         <div className="flex flex-wrap gap-2">
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Response time</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Detections</span>
+                           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">False positives</span>
+                         </div>
+                       </div>
+ 
+                       <div className="mt-auto">
+                         <a className="block w-full text-center rounded-xl border border-slate-300 py-3 text-slate-800 hover:bg-slate-50" href="#">View starter pack</a>
+                       </div>
+                     </div>
+                   </div>
+            </motion.div>
+               </div>
+            </section>
+            )}
+
           </div>
         </section>
 
         {/* Platform Section - Integrated Process */}
+        {false && (
         <section
           id="platform"
           className="w-full py-20 md:py-32 bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-950/30 relative overflow-hidden"
@@ -554,7 +1200,7 @@ export default function LandingPage() {
           {/* Background Elements */}
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
           <div className="container px-4 md:px-6 relative z-10">
             <motion.div
@@ -565,10 +1211,10 @@ export default function LandingPage() {
               className="flex flex-col items-center justify-center space-y-6 text-center mb-20"
             >
               <Badge className="rounded-full px-8 py-3 text-sm font-bold glass-depth shadow-xl border-blue-400/30 bg-blue-500/10 magnetic-hover">
-                <span className="text-blue-600 dark:text-blue-400 font-display">The Core</span>
+                <span className="text-blue-600 dark:text-blue-400 font-display">The CEF Solution</span>
               </Badge>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight">
-                <span className="text-gradient-dynamic">Perceive → Reason → Act</span>
+                <span className="text-gradient-dynamic">Onboard → Reason → Act</span>
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl font-medium leading-relaxed">
                 Private, versioned core loop that ships outcomes fast.
@@ -585,13 +1231,13 @@ export default function LandingPage() {
               {/* Main Process Flow with Enhanced Visual Connections */}
               <div className="relative">
                 {/* Connecting Flow Line */}
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-green-500 to-purple-500 rounded-full opacity-20 hidden lg:block transform -translate-y-1/2 z-0"></div>
+                <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-green-500 to-cyan-500 rounded-full opacity-20 hidden lg:block transform -translate-y-1/2 z-0"></div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 relative z-10">
                   {[
                     {
                       step: "1",
-                      title: "Perceive",
+                      title: "Onboard",
                       feature: "Stream Ingest & Context",
                       description:
                         "Plug SDKs/connectors into your data (events, chats, gameplay). Normalize and tag what matters (who, when, why).",
@@ -688,7 +1334,7 @@ export default function LandingPage() {
                               ))}
                             </ul>
                           ) : (
-                            <p className="text-sm text-gray-600 leading-relaxed text-center">{node.description}</p>
+                          <p className="text-sm text-gray-600 leading-relaxed text-center">{node.description}</p>
                           )}
                         </div>
                       </div>
@@ -773,7 +1419,7 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-center mt-16"
             >
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
+              <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
                 <Link href="https://app.lemcal.com/@fredjin/30-minutes">
                   Book a demo
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -782,6 +1428,7 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </section>
+        )}
 
         <section id="journeys" className="w-full py-20 md:py-32 bg-white dark:bg-gray-950 relative overflow-hidden">
           <div className="container px-4 md:px-6 relative z-10">
@@ -794,16 +1441,79 @@ export default function LandingPage() {
               <Badge className="rounded-full px-6 py-2 text-sm font-bold bg-blue-50 text-blue-700 border-blue-200">
                 Pick a Journey
               </Badge>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display-bold tracking-tight text-gradient-dynamic">
-                Outcome-first starter packs
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight leading-[1.1] text-slate-900 dark:text-white">
+                Outcome-first <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Starter Packs</span>
               </h2>
-              <p className="max-w-[700px] text-muted-foreground md:text-xl font-medium leading-relaxed">
-                Outcome-first starter packs on the same core: Perceive (CISGD) → Reason → Act → Govern.
-              </p>
+              
             </motion.div>
 
-            <div className="grid gap-8 lg:grid-cols-3 mb-16">
+            {/* Mobile emoji timeline (shows only on small screens) */}
+            <div className="md:hidden mb-6">
+              <div className="flex items-center justify-center gap-4">
+                {[
+                  { icon: "🎥", label: "Vision" },
+                  { icon: "🎮", label: "Gaming" },
+                  { icon: "🎧", label: "Support" },
+                  { icon: "🌐", label: "Community" },
+                ].map((item, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); scrollToJourney(i) }}
+                    className={`relative flex flex-col items-center text-xs font-medium transition-transform ${mobileActiveJourney === i ? "scale-110" : "opacity-70"}`}
+                    aria-label={`Go to ${item.label}`}
+                  >
+                    <span className={`text-2xl ${mobileActiveJourney === i ? "drop-shadow-[0_2px_6px_rgba(59,130,246,0.6)]" : ""}`}>{item.icon}</span>
+                    <span className="mt-1">{item.label}</span>
+                    <span
+                      className={`absolute -bottom-2 h-1 rounded-full transition-all duration-300 ${
+                        mobileActiveJourney === i ? "w-6 bg-blue-500" : "w-2 bg-slate-300"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bento-like starter packs grid */}
+            <div
+              ref={mobileUsecaseScrollRef}
+              onScroll={handleMobileScroll}
+              className="flex md:grid gap-4 md:gap-8 md:grid-cols-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none pb-2 [-ms-overflow-style:none] [scrollbar-width:none] mb-16"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
               {[
+                {
+                  title: "Computer Vision: Real-time Anomaly Detection",
+                  heroHeadline: "Computer Vision Ops",
+                  heroDescription:
+                    "Ingest drone/CCTV video into RAFT for real-time detection and automated alerts.",
+                  image: "/placeholder.jpg",
+                  triggers:
+                    "Video frames, illegal parking detection, rail yard monitoring, object recognition events, zone breaches, battery/signal warnings",
+                  items: [
+                    "Streaming video ingest with edge processing",
+                    "CV Detection Agent (96.8% accuracy on transport manifests)",
+                    "Real-time alerting & mission dashboards",
+                    "On-premise data nodes for secure processing",
+                  ],
+                  kpis: [
+                    { name: "Detection accuracy", color: "bg-green-100 text-green-700" },
+                    { name: "Response time", color: "bg-blue-100 text-blue-700" },
+                    { name: "False positive rate", color: "bg-red-100 text-red-700" },
+                    { name: "Infrastructure uptime", color: "bg-purple-100 text-purple-700" },
+                  ],
+                  icon: "🎥",
+                  index: 3,
+                  span: "md:col-span-3",
+                  overview:
+                    "Deploy on-prem computer vision quickly: capture video feeds, process in RAFT, surface live insights and alerts without rebuilding pipelines.",
+                  applicability: [
+                    "Drone/CCTV monitoring",
+                    "Safety & compliance",
+                    "Facilities & logistics",
+                    "Smart city feeds",
+                  ],
+                },
                 {
                   title: "Gaming: Player Retention & Trust/Safety",
                   heroHeadline: "Personalized Game Experiences",
@@ -830,6 +1540,7 @@ export default function LandingPage() {
                     "Social gaming communities",
                     "Free-to-play mobile games",
                   ],
+                  span: "md:col-span-3",
                 },
                 {
                   title: "Support: Conversation Intelligence",
@@ -861,6 +1572,7 @@ export default function LandingPage() {
                     "E-commerce help desks",
                     "Financial services support",
                   ],
+                  span: "md:col-span-3",
                 },
                 {
                   title: "Communities & Web3: Health & Growth",
@@ -887,15 +1599,17 @@ export default function LandingPage() {
                     "Online forums and platforms",
                     "Social media communities",
                   ],
+                  span: "md:col-span-3",
                 },
               ].map((journey, i) => (
                 <motion.div
+                  data-journey-slide
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
-                  className="lg:col-span-1"
+                  className={`snap-center ${journey.span ? `${journey.span}` : "md:col-span-2"} min-w-[85%] md:min-w-0`}
                 >
                   <Card
                     className={`h-full border transition-all duration-500 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-gray-900 overflow-hidden ${
@@ -1123,11 +1837,12 @@ export default function LandingPage() {
           )}
         </section>
 
+        {false && (
         <section
           id="replay"
           className="w-full py-20 md:py-32 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.3),transparent_50%),radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.3),transparent_50%),radial-gradient(circle_at_40%_40%,rgba(120,219,255,0.3),transparent_50%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.2),transparent_50%),radial-gradient(circle_at_80%_20%,rgba(34,211,238,0.2),transparent_50%),radial-gradient(circle_at_40%_40%,rgba(14,165,233,0.3),transparent_50%)]"></div>
 
           <div className="container px-4 md:px-6 relative z-10">
             <motion.div
@@ -1137,8 +1852,8 @@ export default function LandingPage() {
               transition={{ duration: 0.5 }}
               className="flex flex-col items-center justify-center space-y-6 text-center mb-16"
             >
-              <Badge className="rounded-full px-8 py-3 text-sm font-bold glass-depth shadow-xl border-purple-400/30 bg-purple-500/10 magnetic-hover">
-                <span className="text-purple-600 dark:text-purple-400 font-display">Trust Every Decision</span>
+              <Badge className="rounded-full px-8 py-3 text-sm font-bold glass-depth shadow-xl border-blue-400/30 bg-blue-500/10 magnetic-hover">
+                <span className="text-blue-600 dark:text-blue-400 font-display">Trust Every Decision</span>
               </Badge>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight text-gradient-dynamic">
                 Replay any decision
@@ -1170,26 +1885,10 @@ export default function LandingPage() {
               </Card>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center mt-12"
-            >
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl"
-              >
-                <Link href="https://app.lemcal.com/@fredjin/30-minutes">
-                  Book a demo
-                  <ArrowRight className="ml-2 size-4" />
-                </Link>
-              </Button>
-            </motion.div>
+            
           </div>
         </section>
+        )}
 
         <section id="how-it-works" className="w-full py-20 md:py-32 bg-white dark:bg-gray-950 relative overflow-hidden">
           <div className="container px-4 md:px-6 relative z-10">
@@ -1207,7 +1906,7 @@ export default function LandingPage() {
                 How It Works
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl font-medium leading-relaxed">
-                From setup to production in three simple steps.
+                Go from setup to intelligent automation in three steps.
               </p>
             </motion.div>
 
@@ -1218,21 +1917,24 @@ export default function LandingPage() {
                     {[
                       {
                         step: "1",
-                        title: "Connect",
-                        description: "Attach streams and systems. No migrations.",
-                        badge: "Zero migration",
+                        title: "Connect Your Data",
+                        description:
+                          "Securely attach your real-time data streams and systems in minutes, from Kafka and Snowflake to Zendesk and Discord. Our zero-migration approach means you start building instantly.",
+                        badge: "Zero Migration",
                       },
                       {
                         step: "2",
-                        title: "Deploy",
-                        description: "Choose a starter pack; tune prompts, policies, alerts.",
-                        badge: "Configurable",
+                        title: "Define Your Logic",
+                        description:
+                          "Use a starter template or build your own intelligent agent. Define its goals, tune its logic with natural language prompts, and set KPI-based policies that govern its actions.",
+                        badge: "AI-Powered",
                       },
                       {
                         step: "3",
-                        title: "Go live",
-                        description: "Canary first; iterate via replay and versioned runs.",
-                        badge: "Safe rollout",
+                        title: "Launch with Confidence",
+                        description:
+                          "Deploy your new agent as a candidate. Safely test on a small slice of traffic, measure performance against baseline, and let the system auto-promote once impact is proven.",
+                        badge: "KPI-Driven Rollout",
                       },
                     ].map((item, i) => (
                       <motion.div
@@ -1255,6 +1957,8 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Removed: How We Make It Happen (per request) */}
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1390,7 +2094,7 @@ export default function LandingPage() {
 
         {/* Governance Hub Section */}
         <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-radial from-blue-50/50 via-purple-50/30 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-radial from-blue-50/50 via-cyan-50/30 to-transparent"></div>
 
           <div className="container mx-auto px-4 relative">
             <motion.div
@@ -1412,7 +2116,7 @@ export default function LandingPage() {
               {/* Central Hub Graphic */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-80 h-80 rounded-full border-2 border-dashed border-blue-200/40 flex items-center justify-center">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100/50 to-purple-100/50 flex items-center justify-center">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100/50 to-cyan-100/50 flex items-center justify-center">
                     <Shield className="w-16 h-16 text-blue-400/60" strokeWidth={1} />
                   </div>
                 </div>
@@ -1462,8 +2166,8 @@ export default function LandingPage() {
                   transition={{ duration: 0.6, delay: 0.3 }}
                   className="text-center md:text-right md:pr-8"
                 >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 mb-4">
-                    <Play className="w-6 h-6 text-purple-600" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 mb-4">
+                    <Play className="w-6 h-6 text-cyan-600" />
                   </div>
                   <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-3">Replay sandbox</h3>
                   <p className="text-muted-foreground">Test new logic on real data safely</p>
@@ -1490,11 +2194,7 @@ export default function LandingPage() {
                     <circle cx="2" cy="2" r="1" fill="#C7D2FE" opacity="0.5" />
                   </pattern>
                 </defs>
-                {/* Lines connecting center to each quadrant */}
-                <line x1="400" y1="300" x2="200" y2="150" stroke="url(#dots)" strokeWidth="1" opacity="0.6" />
-                <line x1="400" y1="300" x2="600" y2="150" stroke="url(#dots)" strokeWidth="1" opacity="0.6" />
-                <line x1="400" y1="300" x2="200" y2="450" stroke="url(#dots)" strokeWidth="1" opacity="0.6" />
-                <line x1="400" y1="300" x2="600" y2="450" stroke="url(#dots)" strokeWidth="1" opacity="0.6" />
+                {/* Decorative connector lines removed */}
               </svg>
             </div>
 
@@ -1527,12 +2227,12 @@ export default function LandingPage() {
                 Own your AI. Replace the black box.
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl font-medium leading-relaxed">
-                See a live decision replay on your data.
+               
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mt-4">
                 <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold glass shadow-xl">
                   <Link href="https://app.lemcal.com/@fredjin/30-minutes">
-                    See Your Data in Action
+                    See CEF in Action
                     <ArrowRight className="ml-2 size-4" />
                   </Link>
                 </Button>
@@ -1567,7 +2267,7 @@ export default function LandingPage() {
                 <span className="text-sm text-muted-foreground">Sovereign Agents</span>
               </motion.div>
               <p className="text-sm text-muted-foreground max-w-md font-medium leading-relaxed">
-                Deploy event-driven agents in your cloud that perceive, decide, and act on live signals—with full
+                Deploy event-driven agents in your cloud that onboard, decide, and act on live signals, with full
                 replay, lineage/RBAC, and cost/compute transparency.
               </p>
             </div>
