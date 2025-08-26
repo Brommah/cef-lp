@@ -116,21 +116,40 @@ export default function LandingPage() {
   }
 
   const handleJourneyNavigation = (industry: string) => {
-    const journeyIndex = industry === "Gaming" ? 0 : industry === "Support" ? 1 : 2
+    const journeyIndex =
+      industry === "Gaming"
+        ? 0
+        : industry === "Support"
+        ? 1
+        : industry === "Vision"
+        ? 3
+        : 2
 
-    // Scroll to journeys section
-    const journeysSection = document.getElementById("journeys")
-    if (journeysSection) {
-      journeysSection.scrollIntoView({ behavior: "smooth" })
+    // Scroll to the target journey card and center it
+    const container = mobileUsecaseScrollRef.current || document
+    const slides = Array.from(
+      (container as Document | HTMLElement).querySelectorAll('[data-journey-slide]')
+    ) as HTMLElement[]
+    const target = slides[journeyIndex]
+    if (target) {
+      const targetLeft = target.offsetLeft + target.offsetWidth / 2
+      const viewportCenter = (mobileUsecaseScrollRef.current?.clientWidth || window.innerWidth) / 2
+      const newScrollLeft = targetLeft - viewportCenter
+      if (mobileUsecaseScrollRef.current) {
+        mobileUsecaseScrollRef.current.scrollTo({ left: newScrollLeft, behavior: "smooth" })
+      } else {
+        const journeysSection = document.getElementById("journeys")
+        journeysSection?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    } else {
+      // Fallback to section center
+      const journeysSection = document.getElementById("journeys")
+      journeysSection?.scrollIntoView({ behavior: "smooth", block: "center" })
     }
 
-    // Highlight the specific journey card
+    // Highlight the specific journey card briefly
     setHighlightedJourney(journeyIndex)
-
-    // Remove highlight after 3 seconds
-    setTimeout(() => {
-      setHighlightedJourney(null)
-    }, 3000)
+    setTimeout(() => setHighlightedJourney(null), 3000)
   }
 
   const container = {
@@ -226,6 +245,14 @@ export default function LandingPage() {
       cta: "More on Gaming",
       industry: "Gaming",
       icon: <Gamepad2 className="size-4 text-white" />,
+      gradient: "from-blue-500 to-indigo-500",
+    },
+    {
+      headline: "Computer Vision Ops",
+      description: "for autonomous surveillance & security",
+      cta: "More on Vision",
+      industry: "Vision",
+      icon: <Cpu className="size-4 text-white" />,
       gradient: "from-blue-500 to-indigo-500",
     },
   ]
@@ -493,7 +520,11 @@ export default function LandingPage() {
                       rotatingContent[currentProfile].gradient
                     } hover:shadow-2xl hover:scale-105`}
                   >
-                    <Link href="#journeys" className="flex items-center justify-center text-white h-14">
+                    <Link
+                      href="#journeys"
+                      onClick={() => handleJourneyNavigation(rotatingContent[currentProfile].industry)}
+                      className="flex items-center justify-center text-white h-14"
+                    >
                       <div className="absolute bottom-0 left-0 h-1 w-full bg-white/20">
                         <motion.div
                           key={`progress-${currentProfile}`}
@@ -671,7 +702,7 @@ export default function LandingPage() {
                   variant="outline"
                   className="rounded-full h-10 px-6 text-sm font-medium glass-card bg-transparent magnetic-hover"
                 >
-                  <Link href="#contact">CEF SUITE</Link>
+                  <Link href="#contact">CEF Solution</Link>
                 </Button>
 
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
@@ -1903,10 +1934,10 @@ export default function LandingPage() {
                 <span className="text-green-600 dark:text-green-400 font-display">Results in Days</span>
               </Badge>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-display-bold tracking-tight text-gradient-dynamic">
-                How It Works
+                Get Started in Hours, not Weeks
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl font-medium leading-relaxed">
-                Go from setup to intelligent automation in three steps.
+                Go from setup to intelligent automation in three simple steps.
               </p>
             </motion.div>
 
@@ -1917,24 +1948,21 @@ export default function LandingPage() {
                     {[
                       {
                         step: "1",
-                        title: "Connect Your Data",
+                        title: "Connect Your Sovereign Data",
                         description:
-                          "Securely attach your real-time data streams and systems in minutes, from Kafka and Snowflake to Zendesk and Discord. Our zero-migration approach means you start building instantly.",
-                        badge: "Zero Migration",
+                          "Securely attach your real-time data streams, from Kafka to Discord, on your dedicated infrastructure. Zero migration, 100% data ownership, open-source models only.",
                       },
                       {
                         step: "2",
-                        title: "Define Your Logic",
+                        title: "Deploy Multi-Agent Intelligence",
                         description:
-                          "Use a starter template or build your own intelligent agent. Define its goals, tune its logic with natural language prompts, and set KPI-based policies that govern its actions.",
-                        badge: "AI-Powered",
+                          "Custom agents tuned to your data that perceive, decide, and act on live signals. Native multi-agent workflows with secure compute: no data leaks, everything on-premise.",
                       },
                       {
                         step: "3",
-                        title: "Launch with Confidence",
+                        title: "Launch with Full Governance",
                         description:
-                          "Deploy your new agent as a candidate. Safely test on a small slice of traffic, measure performance against baseline, and let the system auto-promote once impact is proven.",
-                        badge: "KPI-Driven Rollout",
+                          "Deploy as candidate versions with performance-gated promotions. Measure against baseline, auto-rollback on KPI misses, complete audit trail for every decision.",
                       },
                     ].map((item, i) => (
                       <motion.div
@@ -1949,8 +1977,7 @@ export default function LandingPage() {
                           {item.step}
                         </div>
                         <h3 className="font-bold text-xl mb-3">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-4">{item.description}</p>
-                        <Badge variant="outline">{item.badge}</Badge>
+                        <p className="text-sm text-muted-foreground">{item.description}</p>
                       </motion.div>
                     ))}
                   </div>
