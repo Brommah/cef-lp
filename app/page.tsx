@@ -211,9 +211,9 @@ export default function LandingPage() {
     // measure once on mount
   }, [])
 
-  // Versions scrollytelling emphasis
+  // Versions scrollytelling emphasis (use window scroll when section is hidden)
   const versionsRef = useRef<HTMLDivElement | null>(null)
-  const { scrollYProgress: versionsProgress } = useScroll({ target: versionsRef, offset: ["start 80%", "end 20%"] })
+  const { scrollYProgress: versionsProgress } = useScroll()
   const v4Scale = useTransform(versionsProgress, [0, 0.15, 0.3], [1.03, 1.0, 0.97])
   const v4Opacity = useTransform(versionsProgress, [0, 0.15, 0.3], [1, 0.9, 0.75])
   const v5Scale = useTransform(versionsProgress, [0.25, 0.5, 0.65], [1.0, 1.05, 1.0])
@@ -750,6 +750,7 @@ export default function LandingPage() {
         </section>
 
         {/* Versions Section - Ship Better Versions */}
+        {false && (
         <section className="w-full py-20 md:py-28 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 relative overflow-hidden">
           <div className="container px-4 md:px-6 relative">
                 <motion.div
@@ -1220,6 +1221,7 @@ export default function LandingPage() {
 
           </div>
         </section>
+        )}
 
         {/* Platform Section - Integrated Process */}
         {false && (
@@ -2242,12 +2244,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="text-center mt-16"
             >
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
-                <Link href="https://app.lemcal.com/@fredjin/30-minutes">
-                  Book a demo
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+            
             </motion.div>
           </div>
         </section>
@@ -2302,11 +2299,11 @@ export default function LandingPage() {
                   alt="CEF Logo"
                   className="h-6 w-auto"
                 />
-                <span className="text-sm text-muted-foreground">Sovereign Agents</span>
+                <span className="text-sm text-muted-foreground">Ship AI Like Software</span>
               </motion.div>
               <p className="text-sm text-muted-foreground max-w-md font-medium leading-relaxed">
-                Deploy event-driven agents in your cloud that onboard, decide, and act on live signals, with full
-                replay, lineage/RBAC, and cost/compute transparency.
+                Test, version, and ship multi‑agent AI on your dedicated stack. Replays, KPI‑gated promotions,
+                instant rollback, and full audit—open‑source models only, no data leaves your infra.
               </p>
             </div>
 
