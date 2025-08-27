@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
 import {
   ChevronRight,
@@ -1034,7 +1035,7 @@ export default function LandingPage() {
                    {/* Gaming */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/gaming-dashboard-analytics.png" alt="Gaming dashboard" className="w-full h-full object-cover" loading="lazy" />
+                       <Image src="/gaming-dashboard-analytics.png" alt="Gaming dashboard" fill className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" priority={false} />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Gamepad2 className="w-4 h-4" />
                          <span className="text-sm font-semibold">Gaming: Player Retention & Trust/Safety</span>
@@ -1079,7 +1080,7 @@ export default function LandingPage() {
                    {/* Support */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/customer-support-dashboard.png" alt="Support dashboard" className="w-full h-full object-cover" loading="lazy" />
+                       <Image src="/customer-support-dashboard.png" alt="Support dashboard" fill className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Headphones className="w-4 h-4" />
                          <span className="text-sm font-semibold">Support: Conversation Intelligence</span>
@@ -1125,7 +1126,7 @@ export default function LandingPage() {
                    {/* Communities */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/web3-community-dashboard.png" alt="Community dashboard" className="w-full h-full object-cover" loading="lazy" />
+                       <Image src="/web3-community-dashboard.png" alt="Community dashboard" fill className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Globe2 className="w-4 h-4" />
                          <span className="text-sm font-semibold">Communities & Web3: Health & Growth</span>
@@ -1170,7 +1171,7 @@ export default function LandingPage() {
                    {/* Computer Vision */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/ai-customer-intelligence-dashboard.png" alt="Computer Vision" className="w-full h-full object-cover" loading="lazy" />
+                       <Image src="/ai-customer-intelligence-dashboard.png" alt="Computer Vision" fill className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Cpu className="w-4 h-4" />
                          <span className="text-sm font-semibold">Computer Vision: Real‑time Anomaly Detection</span>
