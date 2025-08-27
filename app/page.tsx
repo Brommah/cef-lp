@@ -665,7 +665,7 @@ export default function LandingPage() {
                       icon: "🔒",
                     },
                     {
-                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don’t own creates major risks.",
+                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don't own creates major risks.",
                       icon: "🔐",
                     },
                     {
@@ -777,8 +777,8 @@ export default function LandingPage() {
                 <span className="text-slate-700 dark:text-slate-300 text-3xl md:text-4xl block mt-2">With the same safety, speed, and control.</span>
               </h2>
               <p className="mt-6 text-lg md:text-xl text-muted-foreground font-medium text-left">
-                Test, version, and ship multi‑agent AI on your dedicated stack, with replays, KPI gates, and instant rollback. Open‑source models only; no data leaves your infra. <span className="font-semibold">
-                </span>
+                A New Data Compute Platform built from the ground up for multi-agents. Secure, owned, and customized models
+                that evolve with your business. Production ready on 100% sovereign data infrastructure (on‑prem or hybrid).
               </p>
               <div className="mt-6">
                 <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
