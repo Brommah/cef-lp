@@ -42,7 +42,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { useTheme } from "next-themes"
+// next-themes removed; light mode only
 import dynamic from "next/dynamic"
 import { useIsMobile } from "@/hooks/use-mobile"
 
@@ -51,7 +51,6 @@ const HeroTorus = dynamic(() => import("@/components/HeroTorus"), { ssr: false }
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [highlightedJourney, setHighlightedJourney] = useState<number | null>(null)
 
@@ -113,9 +112,7 @@ export default function LandingPage() {
     }
   }, [])
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
+  const toggleTheme = () => {}
 
   const handleJourneyNavigation = (industry: string) => {
     const journeyIndex =
@@ -300,10 +297,7 @@ export default function LandingPage() {
           </motion.div>
           <nav className="hidden md:flex gap-8">{/* Navigation items removed as requested */}</nav>
           <div className="hidden md:flex gap-4 items-center">
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full magnetic-hover">
-              {mounted && theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            {/* Theme toggle removed */}
             <Button asChild className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
               <Link href="https://app.lemcal.com/@fredjin/30-minutes">
                 Book a demo
@@ -312,9 +306,7 @@ export default function LandingPage() {
             </Button>
           </div>
           <div className="flex items-center gap-4 md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
-              {mounted && theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
-            </Button>
+            {/* Theme toggle removed (mobile) */}
             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
               <span className="sr-only">Toggle menu</span>
@@ -1042,7 +1034,7 @@ export default function LandingPage() {
                    {/* Gaming */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/gaming-dashboard-analytics.png" alt="Gaming dashboard" className="w-full h-full object-cover" />
+                       <img src="/gaming-dashboard-analytics.png" alt="Gaming dashboard" className="w-full h-full object-cover" loading="lazy" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Gamepad2 className="w-4 h-4" />
                          <span className="text-sm font-semibold">Gaming: Player Retention & Trust/Safety</span>
@@ -1087,7 +1079,7 @@ export default function LandingPage() {
                    {/* Support */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/customer-support-dashboard.png" alt="Support dashboard" className="w-full h-full object-cover" />
+                       <img src="/customer-support-dashboard.png" alt="Support dashboard" className="w-full h-full object-cover" loading="lazy" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Headphones className="w-4 h-4" />
                          <span className="text-sm font-semibold">Support: Conversation Intelligence</span>
@@ -1133,7 +1125,7 @@ export default function LandingPage() {
                    {/* Communities */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/web3-community-dashboard.png" alt="Community dashboard" className="w-full h-full object-cover" />
+                       <img src="/web3-community-dashboard.png" alt="Community dashboard" className="w-full h-full object-cover" loading="lazy" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Globe2 className="w-4 h-4" />
                          <span className="text-sm font-semibold">Communities & Web3: Health & Growth</span>
@@ -1178,7 +1170,7 @@ export default function LandingPage() {
                    {/* Computer Vision */}
                    <div className="h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                      <div className="relative h-52 bg-gray-100">
-                       <img src="/ai-customer-intelligence-dashboard.png" alt="Computer Vision" className="w-full h-full object-cover" />
+                       <img src="/ai-customer-intelligence-dashboard.png" alt="Computer Vision" className="w-full h-full object-cover" loading="lazy" />
                        <div className="absolute bottom-4 left-4 bg-black/80 text-white rounded-xl px-4 py-2 flex items-center gap-2">
                          <Cpu className="w-4 h-4" />
                          <span className="text-sm font-semibold">Computer Vision: Real‑time Anomaly Detection</span>
