@@ -46,6 +46,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // next-themes removed; light mode only
 import dynamic from "next/dynamic"
 import { useIsMobile } from "@/hooks/use-mobile"
+import JourneysGrid from "@/components/client/JourneysGrid"
 
 const HeroTorus = dynamic(() => import("@/components/HeroTorus"), { ssr: false })
 
