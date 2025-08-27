@@ -140,7 +140,7 @@ export default function LandingPage() {
       if (mobileUsecaseScrollRef.current) {
         mobileUsecaseScrollRef.current.scrollTo({ left: newScrollLeft, behavior: "smooth" })
       } else {
-        const journeysSection = document.getElementById("journeys")
+    const journeysSection = document.getElementById("journeys")
         journeysSection?.scrollIntoView({ behavior: "smooth", block: "center" })
       }
     } else {
@@ -948,11 +948,11 @@ export default function LandingPage() {
                     <div className="group flex items-start gap-2 pl-3 border-l-2 border-brand-accent/40">
                       <ArrowUpRight className="size-4 mt-0.5 text-brand-accent transition-transform group-hover:translate-x-0.5" />
                       <span className="font-semibold"><span className="font-semibold">Proven Impact:</span> <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+6.1%</span> conversion uplift (from onboarding funnel test).</span>
-                    </div>
+                  </div>
                     <div className="group flex items-start gap-2 pl-3 border-l-2 border-brand-accent/40">
                       <Trophy className="size-4 mt-0.5 text-brand-accent" />
                       <span className="font-semibold">Confirmed business impact: <span className="bg-brand-accent/10 text-brand-accent font-semibold tabular-nums px-1.5 rounded">+$1.2M</span> in ARR directly attributed.</span>
-                    </div>
+                </div>
                     <div className="flex items-center gap-2 flex-wrap pt-1">
                       <TooltipProvider>
                         <Tooltip>
@@ -2249,23 +2249,119 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="contact" className="w-full py-20 md:py-32 bg-white dark:bg-gray-950">
-          <div className="container px-4 md:px-6 relative">
+
+      </main>
+
+      {/* Careers Section (single-column list) */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Jobs At <span className="text-blue-600">CEF</span>
+            </h2>
+            <p className="max-w-3xl mx-auto text-muted-foreground md:text-lg leading-relaxed mt-4">
+              Work directly on cutting‑edge AI infrastructure in a global, distributed team environment. Shape the future of data
+              sovereignty while receiving competitive compensation and benefits. We support individuals who demonstrate ownership,
+              adaptability, and a drive to make an impact in the decentralized AI space.
+            </p>
+          </motion.div>
+
+          {/* Filters (visual only) */}
+          <div className="flex items-center justify-center gap-3 mb-10">
+            {['All','Marketing','Design','Developer'].map((f) => (
+              <button
+                key={f}
+                type="button"
+                className="px-4 py-1.5 rounded-full border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          <div className="max-w-5xl mx-auto space-y-6">
+            {[
+              {
+                title: "Founder's Associate",
+                location: "Europe/Berlin",
+                arrangement: "Full-time",
+                href: "https://www.cef.ai/career/operations-generalist",
+              },
+              {
+                title: "AI Innovator",
+                location: "Europe/SF",
+                arrangement: "Full-time",
+                href: "https://www.cef.ai/career/ai-innovator",
+              },
+              {
+                title: "Principal Software Engineer",
+                location: "Europe / US",
+                arrangement: "Full-time",
+                href: "https://www.cef.ai/career/principal-software-engineer",
+              },
+            ].map((job, i) => (
+              <motion.div
+                key={job.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-2xl font-semibold tracking-tight text-gray-900">
+                      {job.title}
+                    </h3>
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-600">
+                      <div>
+                        <div className="font-medium text-gray-500">Location</div>
+                        <div className="mt-1 text-gray-800">{job.location}</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-500">Arrangement</div>
+                        <div className="mt-1 text-gray-800">{job.arrangement}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="rounded-full h-11 px-6 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+                    >
+                      <Link href={job.href} target="_blank" rel="noopener noreferrer">
+                        Learn More!
+                </Link>
+              </Button>
+                  </div>
+                </div>
+            </motion.div>
+            ))}
+          </div>
+          </div>
+        </section>
+
+      {/* Final CTA Section */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center space-y-6 text-center"
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-4xl mx-auto"
             >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display-bold tracking-tight text-gradient-dynamic">
-                Own your AI. Replace the black box.
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-8 [text-wrap:balance]">
+              Own your AI. <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 bg-clip-text text-transparent">Replace the black box.</span>
               </h2>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl font-medium leading-relaxed">
                
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold glass shadow-xl">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button asChild size="lg" className="rounded-full h-12 px-8 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-xl">
                   <Link href="https://app.lemcal.com/@fredjin/30-minutes">
                     See CEF in Action
                     <ArrowRight className="ml-2 size-4" />
@@ -2275,7 +2371,7 @@ export default function LandingPage() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="rounded-full h-12 px-8 text-base font-medium bg-transparent"
+                className="rounded-full h-12 px-8 text-base font-medium bg-transparent hover:bg-gray-50"
                 >
                   <Link href="#journeys">Explore starter packs</Link>
                 </Button>
@@ -2283,7 +2379,6 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </section>
-      </main>
 
       <footer className="w-full border-t glass-header">
         <div className="container flex flex-col gap-8 px-4 py-10 md:px-6 lg:py-16">
