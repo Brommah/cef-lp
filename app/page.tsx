@@ -291,10 +291,13 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <img
+            <Image
               src="https://cdn.prod.website-files.com/674765a62fb62fecf4da7696/674765a62fb62fecf4da7836_Logo%20Nav.svg"
               alt="CEF Logo"
+              width={128}
+              height={32}
               className="h-8 w-auto"
+              priority
             />
           </motion.div>
           <nav className="hidden md:flex gap-8">{/* Navigation items removed as requested */}</nav>
@@ -756,12 +759,13 @@ export default function LandingPage() {
             >
               <div className="mb-4">
                 <div className="inline-flex items-center gap-2" aria-label="CEF logo">
-                  <img
+                  <Image
                     src="https://cdn.prod.website-files.com/674765a62fb62fecf4da7696/674765a62fb62fecf4da7836_Logo%20Nav.svg"
                     alt="CEF logo"
+                    width={128}
+                    height={32}
                     className="h-6 w-auto"
-                    loading="eager"
-                    decoding="async"
+                    priority
                   />
                 </div>
               </div>
@@ -2383,10 +2387,13 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <img
+                <Image
                   src="https://cdn.prod.website-files.com/674765a62fb62fecf4da7696/674765a62fb62fecf4da7836_Logo%20Nav.svg"
                   alt="CEF Logo"
-                  className="h-6 w-auto"
+                  width={128}
+                  height={32}
+                  className="h-8 w-auto"
+                  priority
                 />
                 <span className="text-sm text-muted-foreground">Ship AI Like Software</span>
               </motion.div>

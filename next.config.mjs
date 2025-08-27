@@ -16,6 +16,19 @@ const nextConfig = {
   },
   async headers() {
     return [
+      // Long-cache immutable assets
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/_next/image(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
       {
         source: '/(.*)',
         headers: [
