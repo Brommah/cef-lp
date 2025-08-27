@@ -113,18 +113,19 @@ export default function LandingPage() {
     }
   }, [])
 
-  // Theme is locked to light; toggle is disabled and hidden
-  const toggleTheme = () => {}
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
 
   const handleJourneyNavigation = (industry: string) => {
-    // Map industries to the correct card order in the journeys grid
-    const industryToIndex: Record<string, number> = {
-      Vision: 0,
-      Gaming: 1,
-      Support: 2,
-      Communities: 3,
-    }
-    const journeyIndex = industryToIndex[industry] ?? 0
+    const journeyIndex =
+      industry === "Gaming"
+        ? 0
+        : industry === "Support"
+        ? 1
+        : industry === "Vision"
+        ? 3
+        : 2
 
     // Scroll to the target journey card and center it
     const container = mobileUsecaseScrollRef.current || document
@@ -299,7 +300,10 @@ export default function LandingPage() {
           </motion.div>
           <nav className="hidden md:flex gap-8">{/* Navigation items removed as requested */}</nav>
           <div className="hidden md:flex gap-4 items-center">
-            {/* Theme toggle hidden per request */}
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full magnetic-hover">
+              {mounted && theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
             <Button asChild className="rounded-full h-12 px-8 text-base font-semibold glass-depth shadow-xl bg-blue-600 hover:bg-blue-700 text-white">
               <Link href="https://app.lemcal.com/@fredjin/30-minutes">
                 Book a demo
@@ -308,7 +312,9 @@ export default function LandingPage() {
             </Button>
           </div>
           <div className="flex items-center gap-4 md:hidden">
-            {/* Theme toggle hidden on mobile */}
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
+              {mounted && theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
               <span className="sr-only">Toggle menu</span>
@@ -610,7 +616,7 @@ export default function LandingPage() {
         </section>
         </div>
 
-        <section className="w-full py-20 md:py-32 relative overflow-hidden bg-white pt-40">
+        <section className="w-full py-20 md:py-32 relative overflow-hidden bg-gray-50 dark:bg-gray-900 pt-40">
           <div className="container px-4 md:px-6 relative">
             {/* Section hero */}
             <motion.div
@@ -628,8 +634,8 @@ export default function LandingPage() {
               {/* Split contrast backgrounds (desktop only) */}
               <div className="hidden md:block absolute inset-0 pointer-events-none rounded-3xl" aria-hidden>
                 <div className="absolute inset-y-0 left-0 right-1/2 rounded-l-3xl rounded-r-none bg-slate-900/85"></div>
-                <div className="absolute inset-y-0 left-1/2 right-0 rounded-r-3xl rounded-l-none bg-white/90 backdrop-blur-sm border border-gray-200/60"></div>
-                <div className="absolute inset-y-6 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-slate-300/30 to-transparent"></div>
+                <div className="absolute inset-y-0 left-1/2 right-0 rounded-r-3xl rounded-l-none bg-white/90 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/50"></div>
+                <div className="absolute inset-y-6 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-slate-400/30 dark:via-white/10 to-transparent"></div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-10 md:gap-12 lg:gap-16 relative z-10">
@@ -659,7 +665,7 @@ export default function LandingPage() {
                       icon: "🔒",
                     },
                     {
-                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don't own creates major risks.",
+                      text: "Data Privacy & Security → Exposing sensitive data to third-party models you don’t own creates major risks.",
                       icon: "🔐",
                     },
                     {
@@ -704,11 +710,6 @@ export default function LandingPage() {
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
                   Own the Entire Stack
                 </h2>
-
-                <p className="text-gray-700 font-medium [text-wrap:balance] leading-7 md:leading-8 text-[clamp(12px,2.8vw,16px)] md:text-[clamp(14px,1.05vw,16px)] mb-8">
-                  A New Data Compute Platform built from the ground up for multi-agents. Secure, owned, and customized models
-                  that evolve with your business. Production ready on 100% sovereign data infrastructure (on‑prem or hybrid).
-                </p>
 
                 <div className="space-y-5">
                   {[
@@ -1518,7 +1519,7 @@ export default function LandingPage() {
                   heroHeadline: "Computer Vision Ops: From Anomalies to Robotics",
                   heroDescription:
                     "Ingest video, detect anomalies, and trigger real-time fleet or robotics responses.",
-                  image: "https://cdn.ddcdragon.com/1229/baear4icpzycn4rj6j54dm3y7f3rpsvnnhmbldphgafyrn5od7jdsd6tbsy/20250827_1015_Computer%20Vision%20Technology_remix_01k3n9cgm6e42b5p97jw31y3nv.png?source=developer-console",
+                  image: "/placeholder.jpg",
                   triggers:
                     "Frame ingest, illegal parking, rail‑yard events, object/zone breaches, battery/signal degradations",
                   items: [
