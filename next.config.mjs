@@ -41,12 +41,21 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "img-src 'self' data: blob: https://cdn.prod.website-files.com https://cdn.ddcdragon.com",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self'",
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self' data:",
               "connect-src 'self'",
               "frame-ancestors 'self'",
             ].join('; '),
+          },
+          {
+            key: 'Permissions-Policy',
+            value: [
+              'camera=()',
+              'geolocation=()',
+              'microphone=()',
+              'payment=()'
+            ].join(', '),
           },
         ],
       },
